@@ -1,10 +1,13 @@
 module github.com/limes-cloud/cron
 
-go 1.20
+go 1.21
+
+toolchain go1.21.1
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/go-kratos/kratos/v2 v2.7.2
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang/protobuf v1.5.3
 	github.com/jinzhu/copier v0.4.0
 	github.com/limes-cloud/kratosx v1.0.24
@@ -44,7 +47,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/form/v4 v4.2.1 // indirect
-	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/go-redsync/redsync/v4 v4.12.1 // indirect
 	github.com/go-resty/resty/v2 v2.11.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
@@ -128,3 +131,5 @@ require (
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
 )
+
+replace github.com/limes-cloud/kratosx v1.0.24 => ../kratosx
