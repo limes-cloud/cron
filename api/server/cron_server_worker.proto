@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package cron_server;
+
+option go_package = "./v1;v1";
+
+import "validate/validate.proto";
+import "google/protobuf/struct.proto";
+
+message Worker{
+  uint32 id = 1;
+  string name = 2;
+  string ip = 3;
+  string tag = 4;
+  string status = 5;
+  string stop_desc = 6;
+  string description = 7;
+  uint32 created_at = 8;
+  uint32 updated_at = 9;
+}
+
+message PageWorkerRequest{
+  uint32 page = 1[(validate.rules).uint32 = {gt:0}];
+  uint32 page_size = 2[(validate.rules).uint32 = {lte:100}];
+  optional string tag = 3[(validate.rules).string = {min_len:1}];
+  optional string ip = 4[(validate.rules).string = {ip:true}];
+  optional string name = 5[(validate.rules).string = {min_len:1}];
+  optional bool status = 6;
+}
+
+message PageWorkerReply{
+  uint32 total = 1;
+  repeated Worker list = 2;
+}
+
+message AddWorkerRequest{
+  string name = 1[(validate.rules).string = {min_len:1}];
+  string ip = 2[(validate.rules).string = {min_len:1}];
+  string tag = 3[(validate.rules).string = {min_len:1}];
+  string description = 4[(validate.rules).string = {min_len:1}];
+}
+
+message AddWorkerReply{
+  uint32 id = 1;
+}
+
+message UpdateWorkerRequest{
+  string name = 1[(validate.rules).string = {min_len:1}];
+  string ip = 2[(validate.rules).string = {min_len:1}];
+  string tag = 3[(validate.rules).string = {min_len:1}];
+  string description = 4[(validate.rules).string = {min_len:1}];
+}
+
+message OnlineWorkerRequest{
+  oneof params{
+    uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+    string ip = 2[(validate.rules).string = {min_len:1}];
+  };
+}
+
+message OfflineWorkerRequest{
+  oneof params{
+    uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+    string ip = 2[(validate.rules).string = {min_len:1}];
+  };
+}
+
+message DeleteWorkerRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}

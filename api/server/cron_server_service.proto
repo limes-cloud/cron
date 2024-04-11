@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package cron_server;
+option go_package = "./v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "cron_server_worker.proto";
+
+
+service Service {
+  rpc PageWorker(PageWorkerRequest) returns(PageWorkerReply){
+    option (google.api.http) = {
+      get: "/cron/v1/worker",
+    };
+  }
+
+  rpc AddWorker(AddWorkerRequest) returns(AddWorkerReply){
+    option (google.api.http) = {
+      post: "/cron/v1/worker",
+      body: "*"
+    };
+  }
+
+  rpc UpdateWorker(UpdateWorkerRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      put: "/cron/v1/worker",
+      body: "*"
+    };
+  }
+
+  rpc OnlineWorker(UpdateWorkerRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/cron/v1/worker/online",
+      body: "*"
+    };
+  }
+
+  rpc OfflineWorker(UpdateWorkerRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/cron/v1/worker/offline",
+      body: "*"
+    };
+  }
+
+  rpc DeleteWorker(DeleteWorkerRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/cron/v1/worker",
+      body: "*"
+    };
+  }
+
+}

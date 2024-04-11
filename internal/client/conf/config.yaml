@@ -1,0 +1,20 @@
+name: cron
+server:
+  count: 3
+  grpc:
+    host: 0.0.0.0
+    port: 8121
+    timeout: 10s
+log:
+  level: 0 #日志输出等级
+  output:
+    - stdout # stdout:控制台输出，k8s日志收集
+    - file # file:输出到文件
+  file: #output存在file时此配置才可生效
+    name: ./tmp/runtime/output.log #日志存放地址
+    maxSize: 1 #日志文件最大容量,单位m
+    maxBackup: 5 #日志文件最多保存个数
+    maxAge: 1 #保留就文件的最大天数,单位天
+    compress: false #是否进行压缩归档
+business:
+  shell: "/bin/bash"
