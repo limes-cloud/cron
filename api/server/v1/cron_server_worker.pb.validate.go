@@ -35,6 +35,853 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on WorkerGroup with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *WorkerGroup) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WorkerGroup with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in WorkerGroupMultiError, or
+// nil if none found.
+func (m *WorkerGroup) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WorkerGroup) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Name
+
+	// no validation rules for Description
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	if len(errors) > 0 {
+		return WorkerGroupMultiError(errors)
+	}
+
+	return nil
+}
+
+// WorkerGroupMultiError is an error wrapping multiple validation errors
+// returned by WorkerGroup.ValidateAll() if the designated constraints aren't met.
+type WorkerGroupMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WorkerGroupMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WorkerGroupMultiError) AllErrors() []error { return m }
+
+// WorkerGroupValidationError is the validation error returned by
+// WorkerGroup.Validate if the designated constraints aren't met.
+type WorkerGroupValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkerGroupValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkerGroupValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkerGroupValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkerGroupValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkerGroupValidationError) ErrorName() string { return "WorkerGroupValidationError" }
+
+// Error satisfies the builtin error interface
+func (e WorkerGroupValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkerGroup.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkerGroupValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkerGroupValidationError{}
+
+// Validate checks the field values on PageWorkerGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PageWorkerGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PageWorkerGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PageWorkerGroupRequestMultiError, or nil if none found.
+func (m *PageWorkerGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PageWorkerGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetPage() <= 0 {
+		err := PageWorkerGroupRequestValidationError{
+			field:  "Page",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetPageSize() > 100 {
+		err := PageWorkerGroupRequestValidationError{
+			field:  "PageSize",
+			reason: "value must be less than or equal to 100",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return PageWorkerGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// PageWorkerGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by PageWorkerGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type PageWorkerGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PageWorkerGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PageWorkerGroupRequestMultiError) AllErrors() []error { return m }
+
+// PageWorkerGroupRequestValidationError is the validation error returned by
+// PageWorkerGroupRequest.Validate if the designated constraints aren't met.
+type PageWorkerGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PageWorkerGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PageWorkerGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PageWorkerGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PageWorkerGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PageWorkerGroupRequestValidationError) ErrorName() string {
+	return "PageWorkerGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PageWorkerGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPageWorkerGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PageWorkerGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PageWorkerGroupRequestValidationError{}
+
+// Validate checks the field values on PageWorkerGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PageWorkerGroupReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PageWorkerGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PageWorkerGroupReplyMultiError, or nil if none found.
+func (m *PageWorkerGroupReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PageWorkerGroupReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Total
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PageWorkerGroupReplyValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PageWorkerGroupReplyValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PageWorkerGroupReplyValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return PageWorkerGroupReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// PageWorkerGroupReplyMultiError is an error wrapping multiple validation
+// errors returned by PageWorkerGroupReply.ValidateAll() if the designated
+// constraints aren't met.
+type PageWorkerGroupReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PageWorkerGroupReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PageWorkerGroupReplyMultiError) AllErrors() []error { return m }
+
+// PageWorkerGroupReplyValidationError is the validation error returned by
+// PageWorkerGroupReply.Validate if the designated constraints aren't met.
+type PageWorkerGroupReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PageWorkerGroupReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PageWorkerGroupReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PageWorkerGroupReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PageWorkerGroupReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PageWorkerGroupReplyValidationError) ErrorName() string {
+	return "PageWorkerGroupReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PageWorkerGroupReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPageWorkerGroupReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PageWorkerGroupReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PageWorkerGroupReplyValidationError{}
+
+// Validate checks the field values on AddWorkerGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddWorkerGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddWorkerGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddWorkerGroupRequestMultiError, or nil if none found.
+func (m *AddWorkerGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddWorkerGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := AddWorkerGroupRequestValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		err := AddWorkerGroupRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AddWorkerGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddWorkerGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by AddWorkerGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type AddWorkerGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddWorkerGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddWorkerGroupRequestMultiError) AllErrors() []error { return m }
+
+// AddWorkerGroupRequestValidationError is the validation error returned by
+// AddWorkerGroupRequest.Validate if the designated constraints aren't met.
+type AddWorkerGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddWorkerGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddWorkerGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddWorkerGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddWorkerGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddWorkerGroupRequestValidationError) ErrorName() string {
+	return "AddWorkerGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddWorkerGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddWorkerGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddWorkerGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddWorkerGroupRequestValidationError{}
+
+// Validate checks the field values on AddWorkerGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddWorkerGroupReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddWorkerGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddWorkerGroupReplyMultiError, or nil if none found.
+func (m *AddWorkerGroupReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddWorkerGroupReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return AddWorkerGroupReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddWorkerGroupReplyMultiError is an error wrapping multiple validation
+// errors returned by AddWorkerGroupReply.ValidateAll() if the designated
+// constraints aren't met.
+type AddWorkerGroupReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddWorkerGroupReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddWorkerGroupReplyMultiError) AllErrors() []error { return m }
+
+// AddWorkerGroupReplyValidationError is the validation error returned by
+// AddWorkerGroupReply.Validate if the designated constraints aren't met.
+type AddWorkerGroupReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddWorkerGroupReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddWorkerGroupReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddWorkerGroupReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddWorkerGroupReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddWorkerGroupReplyValidationError) ErrorName() string {
+	return "AddWorkerGroupReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddWorkerGroupReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddWorkerGroupReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddWorkerGroupReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddWorkerGroupReplyValidationError{}
+
+// Validate checks the field values on UpdateWorkerGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateWorkerGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateWorkerGroupRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateWorkerGroupRequestMultiError, or nil if none found.
+func (m *UpdateWorkerGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateWorkerGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := UpdateWorkerGroupRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := UpdateWorkerGroupRequestValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		err := UpdateWorkerGroupRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return UpdateWorkerGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateWorkerGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by UpdateWorkerGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateWorkerGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateWorkerGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateWorkerGroupRequestMultiError) AllErrors() []error { return m }
+
+// UpdateWorkerGroupRequestValidationError is the validation error returned by
+// UpdateWorkerGroupRequest.Validate if the designated constraints aren't met.
+type UpdateWorkerGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateWorkerGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateWorkerGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateWorkerGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateWorkerGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateWorkerGroupRequestValidationError) ErrorName() string {
+	return "UpdateWorkerGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateWorkerGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateWorkerGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateWorkerGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateWorkerGroupRequestValidationError{}
+
+// Validate checks the field values on DeleteWorkerGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteWorkerGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteWorkerGroupRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteWorkerGroupRequestMultiError, or nil if none found.
+func (m *DeleteWorkerGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteWorkerGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := DeleteWorkerGroupRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DeleteWorkerGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteWorkerGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by DeleteWorkerGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteWorkerGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteWorkerGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteWorkerGroupRequestMultiError) AllErrors() []error { return m }
+
+// DeleteWorkerGroupRequestValidationError is the validation error returned by
+// DeleteWorkerGroupRequest.Validate if the designated constraints aren't met.
+type DeleteWorkerGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteWorkerGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteWorkerGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteWorkerGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteWorkerGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteWorkerGroupRequestValidationError) ErrorName() string {
+	return "DeleteWorkerGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteWorkerGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteWorkerGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteWorkerGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteWorkerGroupRequestValidationError{}
+
 // Validate checks the field values on Worker with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -852,93 +1699,53 @@ var _ interface {
 	ErrorName() string
 } = UpdateWorkerRequestValidationError{}
 
-// Validate checks the field values on OnlineWorkerRequest with the rules
+// Validate checks the field values on EnableWorkerRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *OnlineWorkerRequest) Validate() error {
+func (m *EnableWorkerRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on OnlineWorkerRequest with the rules
+// ValidateAll checks the field values on EnableWorkerRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// OnlineWorkerRequestMultiError, or nil if none found.
-func (m *OnlineWorkerRequest) ValidateAll() error {
+// EnableWorkerRequestMultiError, or nil if none found.
+func (m *EnableWorkerRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *OnlineWorkerRequest) validate(all bool) error {
+func (m *EnableWorkerRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	switch v := m.Params.(type) {
-	case *OnlineWorkerRequest_Id:
-		if v == nil {
-			err := OnlineWorkerRequestValidationError{
-				field:  "Params",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+	if m.GetId() <= 0 {
+		err := EnableWorkerRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
 		}
-
-		if m.GetId() <= 0 {
-			err := OnlineWorkerRequestValidationError{
-				field:  "Id",
-				reason: "value must be greater than 0",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+		if !all {
+			return err
 		}
-
-	case *OnlineWorkerRequest_Ip:
-		if v == nil {
-			err := OnlineWorkerRequestValidationError{
-				field:  "Params",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if utf8.RuneCountInString(m.GetIp()) < 1 {
-			err := OnlineWorkerRequestValidationError{
-				field:  "Ip",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	default:
-		_ = v // ensures v is used
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
-		return OnlineWorkerRequestMultiError(errors)
+		return EnableWorkerRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// OnlineWorkerRequestMultiError is an error wrapping multiple validation
-// errors returned by OnlineWorkerRequest.ValidateAll() if the designated
+// EnableWorkerRequestMultiError is an error wrapping multiple validation
+// errors returned by EnableWorkerRequest.ValidateAll() if the designated
 // constraints aren't met.
-type OnlineWorkerRequestMultiError []error
+type EnableWorkerRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m OnlineWorkerRequestMultiError) Error() string {
+func (m EnableWorkerRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -947,11 +1754,11 @@ func (m OnlineWorkerRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m OnlineWorkerRequestMultiError) AllErrors() []error { return m }
+func (m EnableWorkerRequestMultiError) AllErrors() []error { return m }
 
-// OnlineWorkerRequestValidationError is the validation error returned by
-// OnlineWorkerRequest.Validate if the designated constraints aren't met.
-type OnlineWorkerRequestValidationError struct {
+// EnableWorkerRequestValidationError is the validation error returned by
+// EnableWorkerRequest.Validate if the designated constraints aren't met.
+type EnableWorkerRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -959,24 +1766,24 @@ type OnlineWorkerRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e OnlineWorkerRequestValidationError) Field() string { return e.field }
+func (e EnableWorkerRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e OnlineWorkerRequestValidationError) Reason() string { return e.reason }
+func (e EnableWorkerRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e OnlineWorkerRequestValidationError) Cause() error { return e.cause }
+func (e EnableWorkerRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e OnlineWorkerRequestValidationError) Key() bool { return e.key }
+func (e EnableWorkerRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e OnlineWorkerRequestValidationError) ErrorName() string {
-	return "OnlineWorkerRequestValidationError"
+func (e EnableWorkerRequestValidationError) ErrorName() string {
+	return "EnableWorkerRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e OnlineWorkerRequestValidationError) Error() string {
+func (e EnableWorkerRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -988,14 +1795,14 @@ func (e OnlineWorkerRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sOnlineWorkerRequest.%s: %s%s",
+		"invalid %sEnableWorkerRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = OnlineWorkerRequestValidationError{}
+var _ error = EnableWorkerRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1003,95 +1810,55 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = OnlineWorkerRequestValidationError{}
+} = EnableWorkerRequestValidationError{}
 
-// Validate checks the field values on OfflineWorkerRequest with the rules
+// Validate checks the field values on DisableWorkerRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *OfflineWorkerRequest) Validate() error {
+func (m *DisableWorkerRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on OfflineWorkerRequest with the rules
+// ValidateAll checks the field values on DisableWorkerRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// OfflineWorkerRequestMultiError, or nil if none found.
-func (m *OfflineWorkerRequest) ValidateAll() error {
+// DisableWorkerRequestMultiError, or nil if none found.
+func (m *DisableWorkerRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *OfflineWorkerRequest) validate(all bool) error {
+func (m *DisableWorkerRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	switch v := m.Params.(type) {
-	case *OfflineWorkerRequest_Id:
-		if v == nil {
-			err := OfflineWorkerRequestValidationError{
-				field:  "Params",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+	if m.GetId() <= 0 {
+		err := DisableWorkerRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
 		}
-
-		if m.GetId() <= 0 {
-			err := OfflineWorkerRequestValidationError{
-				field:  "Id",
-				reason: "value must be greater than 0",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+		if !all {
+			return err
 		}
-
-	case *OfflineWorkerRequest_Ip:
-		if v == nil {
-			err := OfflineWorkerRequestValidationError{
-				field:  "Params",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if utf8.RuneCountInString(m.GetIp()) < 1 {
-			err := OfflineWorkerRequestValidationError{
-				field:  "Ip",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	default:
-		_ = v // ensures v is used
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
-		return OfflineWorkerRequestMultiError(errors)
+		return DisableWorkerRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// OfflineWorkerRequestMultiError is an error wrapping multiple validation
-// errors returned by OfflineWorkerRequest.ValidateAll() if the designated
+// DisableWorkerRequestMultiError is an error wrapping multiple validation
+// errors returned by DisableWorkerRequest.ValidateAll() if the designated
 // constraints aren't met.
-type OfflineWorkerRequestMultiError []error
+type DisableWorkerRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m OfflineWorkerRequestMultiError) Error() string {
+func (m DisableWorkerRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1100,11 +1867,11 @@ func (m OfflineWorkerRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m OfflineWorkerRequestMultiError) AllErrors() []error { return m }
+func (m DisableWorkerRequestMultiError) AllErrors() []error { return m }
 
-// OfflineWorkerRequestValidationError is the validation error returned by
-// OfflineWorkerRequest.Validate if the designated constraints aren't met.
-type OfflineWorkerRequestValidationError struct {
+// DisableWorkerRequestValidationError is the validation error returned by
+// DisableWorkerRequest.Validate if the designated constraints aren't met.
+type DisableWorkerRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1112,24 +1879,24 @@ type OfflineWorkerRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e OfflineWorkerRequestValidationError) Field() string { return e.field }
+func (e DisableWorkerRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e OfflineWorkerRequestValidationError) Reason() string { return e.reason }
+func (e DisableWorkerRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e OfflineWorkerRequestValidationError) Cause() error { return e.cause }
+func (e DisableWorkerRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e OfflineWorkerRequestValidationError) Key() bool { return e.key }
+func (e DisableWorkerRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e OfflineWorkerRequestValidationError) ErrorName() string {
-	return "OfflineWorkerRequestValidationError"
+func (e DisableWorkerRequestValidationError) ErrorName() string {
+	return "DisableWorkerRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e OfflineWorkerRequestValidationError) Error() string {
+func (e DisableWorkerRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1141,14 +1908,14 @@ func (e OfflineWorkerRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sOfflineWorkerRequest.%s: %s%s",
+		"invalid %sDisableWorkerRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = OfflineWorkerRequestValidationError{}
+var _ error = DisableWorkerRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1156,7 +1923,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = OfflineWorkerRequestValidationError{}
+} = DisableWorkerRequestValidationError{}
 
 // Validate checks the field values on DeleteWorkerRequest with the rules
 // defined in the proto definition for this message. If any rules are

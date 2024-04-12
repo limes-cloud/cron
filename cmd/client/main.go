@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
 
+	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
@@ -21,6 +23,9 @@ func main() {
 	app := kratosx.New(
 		kratosx.Config(file.NewSource(*path)),
 		kratosx.RegistrarServer(RegisterServer),
+		kratosx.Options(kratos.BeforeStop(func(ctx context.Context) error {
+			return nil
+		})),
 	)
 
 	if err := app.Run(); err != nil {

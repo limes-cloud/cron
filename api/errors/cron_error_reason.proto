@@ -8,7 +8,7 @@ option go_package = "./;errors";
 
 enum ErrorReason {
   // 设置缺省错误码
-  option (errors.default_code) = 200;
+  option (errors.default_code) = 400;
 
   NotFound = 0[(errors.message)="数据不存在"];
   Database = 1[(errors.message)="数据库错误"];
@@ -24,6 +24,8 @@ enum ErrorReason {
   DisableNotEnableTask = 11[(errors.message)="不能禁用非激活的任务"];
   UpdateNotEnableTask = 12[(errors.message)="不能更新非激活的任务"];
   NotSupportTaskType = 13[(errors.message)="错误的任务类型"];
+  ExecTaskFail = 14[(errors.message)="执行任务失败"];
+  WorkerNotAvailable = 15[(errors.message)="节点不可用"];
 }
 
 

@@ -20,24 +20,50 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Service_PageWorker_FullMethodName    = "/cron_server.Service/PageWorker"
-	Service_AddWorker_FullMethodName     = "/cron_server.Service/AddWorker"
-	Service_UpdateWorker_FullMethodName  = "/cron_server.Service/UpdateWorker"
-	Service_OnlineWorker_FullMethodName  = "/cron_server.Service/OnlineWorker"
-	Service_OfflineWorker_FullMethodName = "/cron_server.Service/OfflineWorker"
-	Service_DeleteWorker_FullMethodName  = "/cron_server.Service/DeleteWorker"
+	Service_PageWorkerGroup_FullMethodName   = "/cron_server.Service/PageWorkerGroup"
+	Service_AddWorkerGroup_FullMethodName    = "/cron_server.Service/AddWorkerGroup"
+	Service_UpdateWorkerGroup_FullMethodName = "/cron_server.Service/UpdateWorkerGroup"
+	Service_DeleteWorkerGroup_FullMethodName = "/cron_server.Service/DeleteWorkerGroup"
+	Service_PageWorker_FullMethodName        = "/cron_server.Service/PageWorker"
+	Service_AddWorker_FullMethodName         = "/cron_server.Service/AddWorker"
+	Service_UpdateWorker_FullMethodName      = "/cron_server.Service/UpdateWorker"
+	Service_EnableWorker_FullMethodName      = "/cron_server.Service/EnableWorker"
+	Service_DisableWorker_FullMethodName     = "/cron_server.Service/DisableWorker"
+	Service_DeleteWorker_FullMethodName      = "/cron_server.Service/DeleteWorker"
+	Service_PageTask_FullMethodName          = "/cron_server.Service/PageTask"
+	Service_AddTask_FullMethodName           = "/cron_server.Service/AddTask"
+	Service_UpdateTask_FullMethodName        = "/cron_server.Service/UpdateTask"
+	Service_EnableTask_FullMethodName        = "/cron_server.Service/EnableTask"
+	Service_DisableTask_FullMethodName       = "/cron_server.Service/DisableTask"
+	Service_DeleteTask_FullMethodName        = "/cron_server.Service/DeleteTask"
+	Service_CancelExecTask_FullMethodName    = "/cron_server.Service/CancelExecTask"
+	Service_PageLog_FullMethodName           = "/cron_server.Service/PageLog"
+	Service_GetLog_FullMethodName            = "/cron_server.Service/GetLog"
 )
 
 // ServiceClient is the client API for Service service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ServiceClient interface {
+	PageWorkerGroup(ctx context.Context, in *PageWorkerGroupRequest, opts ...grpc.CallOption) (*PageWorkerGroupReply, error)
+	AddWorkerGroup(ctx context.Context, in *AddWorkerGroupRequest, opts ...grpc.CallOption) (*AddWorkerGroupReply, error)
+	UpdateWorkerGroup(ctx context.Context, in *UpdateWorkerGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteWorkerGroup(ctx context.Context, in *DeleteWorkerGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PageWorker(ctx context.Context, in *PageWorkerRequest, opts ...grpc.CallOption) (*PageWorkerReply, error)
 	AddWorker(ctx context.Context, in *AddWorkerRequest, opts ...grpc.CallOption) (*AddWorkerReply, error)
 	UpdateWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	OnlineWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	OfflineWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	EnableWorker(ctx context.Context, in *EnableWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DisableWorker(ctx context.Context, in *DisableWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteWorker(ctx context.Context, in *DeleteWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	PageTask(ctx context.Context, in *PageTaskRequest, opts ...grpc.CallOption) (*PageTaskReply, error)
+	AddTask(ctx context.Context, in *AddTaskRequest, opts ...grpc.CallOption) (*AddTaskReply, error)
+	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	EnableTask(ctx context.Context, in *EnableTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DisableTask(ctx context.Context, in *DisableTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	PageLog(ctx context.Context, in *PageLogRequest, opts ...grpc.CallOption) (*PageLogReply, error)
+	GetLog(ctx context.Context, in *GetLogRequest, opts ...grpc.CallOption) (*Log, error)
 }
 
 type serviceClient struct {
@@ -46,6 +72,42 @@ type serviceClient struct {
 
 func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
 	return &serviceClient{cc}
+}
+
+func (c *serviceClient) PageWorkerGroup(ctx context.Context, in *PageWorkerGroupRequest, opts ...grpc.CallOption) (*PageWorkerGroupReply, error) {
+	out := new(PageWorkerGroupReply)
+	err := c.cc.Invoke(ctx, Service_PageWorkerGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) AddWorkerGroup(ctx context.Context, in *AddWorkerGroupRequest, opts ...grpc.CallOption) (*AddWorkerGroupReply, error) {
+	out := new(AddWorkerGroupReply)
+	err := c.cc.Invoke(ctx, Service_AddWorkerGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) UpdateWorkerGroup(ctx context.Context, in *UpdateWorkerGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_UpdateWorkerGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) DeleteWorkerGroup(ctx context.Context, in *DeleteWorkerGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_DeleteWorkerGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *serviceClient) PageWorker(ctx context.Context, in *PageWorkerRequest, opts ...grpc.CallOption) (*PageWorkerReply, error) {
@@ -75,18 +137,18 @@ func (c *serviceClient) UpdateWorker(ctx context.Context, in *UpdateWorkerReques
 	return out, nil
 }
 
-func (c *serviceClient) OnlineWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *serviceClient) EnableWorker(ctx context.Context, in *EnableWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Service_OnlineWorker_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Service_EnableWorker_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serviceClient) OfflineWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *serviceClient) DisableWorker(ctx context.Context, in *DisableWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Service_OfflineWorker_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Service_DisableWorker_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,16 +164,110 @@ func (c *serviceClient) DeleteWorker(ctx context.Context, in *DeleteWorkerReques
 	return out, nil
 }
 
+func (c *serviceClient) PageTask(ctx context.Context, in *PageTaskRequest, opts ...grpc.CallOption) (*PageTaskReply, error) {
+	out := new(PageTaskReply)
+	err := c.cc.Invoke(ctx, Service_PageTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) AddTask(ctx context.Context, in *AddTaskRequest, opts ...grpc.CallOption) (*AddTaskReply, error) {
+	out := new(AddTaskReply)
+	err := c.cc.Invoke(ctx, Service_AddTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_UpdateTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) EnableTask(ctx context.Context, in *EnableTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_EnableTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) DisableTask(ctx context.Context, in *DisableTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_DisableTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_DeleteTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_CancelExecTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) PageLog(ctx context.Context, in *PageLogRequest, opts ...grpc.CallOption) (*PageLogReply, error) {
+	out := new(PageLogReply)
+	err := c.cc.Invoke(ctx, Service_PageLog_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) GetLog(ctx context.Context, in *GetLogRequest, opts ...grpc.CallOption) (*Log, error) {
+	out := new(Log)
+	err := c.cc.Invoke(ctx, Service_GetLog_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServiceServer is the server API for Service service.
 // All implementations must embed UnimplementedServiceServer
 // for forward compatibility
 type ServiceServer interface {
+	PageWorkerGroup(context.Context, *PageWorkerGroupRequest) (*PageWorkerGroupReply, error)
+	AddWorkerGroup(context.Context, *AddWorkerGroupRequest) (*AddWorkerGroupReply, error)
+	UpdateWorkerGroup(context.Context, *UpdateWorkerGroupRequest) (*emptypb.Empty, error)
+	DeleteWorkerGroup(context.Context, *DeleteWorkerGroupRequest) (*emptypb.Empty, error)
 	PageWorker(context.Context, *PageWorkerRequest) (*PageWorkerReply, error)
 	AddWorker(context.Context, *AddWorkerRequest) (*AddWorkerReply, error)
 	UpdateWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error)
-	OnlineWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error)
-	OfflineWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error)
+	EnableWorker(context.Context, *EnableWorkerRequest) (*emptypb.Empty, error)
+	DisableWorker(context.Context, *DisableWorkerRequest) (*emptypb.Empty, error)
 	DeleteWorker(context.Context, *DeleteWorkerRequest) (*emptypb.Empty, error)
+	PageTask(context.Context, *PageTaskRequest) (*PageTaskReply, error)
+	AddTask(context.Context, *AddTaskRequest) (*AddTaskReply, error)
+	UpdateTask(context.Context, *UpdateTaskRequest) (*emptypb.Empty, error)
+	EnableTask(context.Context, *EnableTaskRequest) (*emptypb.Empty, error)
+	DisableTask(context.Context, *DisableTaskRequest) (*emptypb.Empty, error)
+	DeleteTask(context.Context, *DeleteTaskRequest) (*emptypb.Empty, error)
+	CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error)
+	PageLog(context.Context, *PageLogRequest) (*PageLogReply, error)
+	GetLog(context.Context, *GetLogRequest) (*Log, error)
 	mustEmbedUnimplementedServiceServer()
 }
 
@@ -119,6 +275,18 @@ type ServiceServer interface {
 type UnimplementedServiceServer struct {
 }
 
+func (UnimplementedServiceServer) PageWorkerGroup(context.Context, *PageWorkerGroupRequest) (*PageWorkerGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PageWorkerGroup not implemented")
+}
+func (UnimplementedServiceServer) AddWorkerGroup(context.Context, *AddWorkerGroupRequest) (*AddWorkerGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddWorkerGroup not implemented")
+}
+func (UnimplementedServiceServer) UpdateWorkerGroup(context.Context, *UpdateWorkerGroupRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWorkerGroup not implemented")
+}
+func (UnimplementedServiceServer) DeleteWorkerGroup(context.Context, *DeleteWorkerGroupRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorkerGroup not implemented")
+}
 func (UnimplementedServiceServer) PageWorker(context.Context, *PageWorkerRequest) (*PageWorkerReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PageWorker not implemented")
 }
@@ -128,14 +296,41 @@ func (UnimplementedServiceServer) AddWorker(context.Context, *AddWorkerRequest) 
 func (UnimplementedServiceServer) UpdateWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateWorker not implemented")
 }
-func (UnimplementedServiceServer) OnlineWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method OnlineWorker not implemented")
+func (UnimplementedServiceServer) EnableWorker(context.Context, *EnableWorkerRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnableWorker not implemented")
 }
-func (UnimplementedServiceServer) OfflineWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method OfflineWorker not implemented")
+func (UnimplementedServiceServer) DisableWorker(context.Context, *DisableWorkerRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableWorker not implemented")
 }
 func (UnimplementedServiceServer) DeleteWorker(context.Context, *DeleteWorkerRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorker not implemented")
+}
+func (UnimplementedServiceServer) PageTask(context.Context, *PageTaskRequest) (*PageTaskReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PageTask not implemented")
+}
+func (UnimplementedServiceServer) AddTask(context.Context, *AddTaskRequest) (*AddTaskReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTask not implemented")
+}
+func (UnimplementedServiceServer) UpdateTask(context.Context, *UpdateTaskRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTask not implemented")
+}
+func (UnimplementedServiceServer) EnableTask(context.Context, *EnableTaskRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnableTask not implemented")
+}
+func (UnimplementedServiceServer) DisableTask(context.Context, *DisableTaskRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableTask not implemented")
+}
+func (UnimplementedServiceServer) DeleteTask(context.Context, *DeleteTaskRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTask not implemented")
+}
+func (UnimplementedServiceServer) CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelExecTask not implemented")
+}
+func (UnimplementedServiceServer) PageLog(context.Context, *PageLogRequest) (*PageLogReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PageLog not implemented")
+}
+func (UnimplementedServiceServer) GetLog(context.Context, *GetLogRequest) (*Log, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLog not implemented")
 }
 func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
 
@@ -148,6 +343,78 @@ type UnsafeServiceServer interface {
 
 func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
 	s.RegisterService(&Service_ServiceDesc, srv)
+}
+
+func _Service_PageWorkerGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PageWorkerGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).PageWorkerGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_PageWorkerGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).PageWorkerGroup(ctx, req.(*PageWorkerGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_AddWorkerGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddWorkerGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).AddWorkerGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_AddWorkerGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).AddWorkerGroup(ctx, req.(*AddWorkerGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_UpdateWorkerGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWorkerGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).UpdateWorkerGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_UpdateWorkerGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).UpdateWorkerGroup(ctx, req.(*UpdateWorkerGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_DeleteWorkerGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteWorkerGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).DeleteWorkerGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_DeleteWorkerGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).DeleteWorkerGroup(ctx, req.(*DeleteWorkerGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Service_PageWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -204,38 +471,38 @@ func _Service_UpdateWorker_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Service_OnlineWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateWorkerRequest)
+func _Service_EnableWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnableWorkerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServiceServer).OnlineWorker(ctx, in)
+		return srv.(ServiceServer).EnableWorker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Service_OnlineWorker_FullMethodName,
+		FullMethod: Service_EnableWorker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).OnlineWorker(ctx, req.(*UpdateWorkerRequest))
+		return srv.(ServiceServer).EnableWorker(ctx, req.(*EnableWorkerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Service_OfflineWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateWorkerRequest)
+func _Service_DisableWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DisableWorkerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServiceServer).OfflineWorker(ctx, in)
+		return srv.(ServiceServer).DisableWorker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Service_OfflineWorker_FullMethodName,
+		FullMethod: Service_DisableWorker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).OfflineWorker(ctx, req.(*UpdateWorkerRequest))
+		return srv.(ServiceServer).DisableWorker(ctx, req.(*DisableWorkerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -258,6 +525,168 @@ func _Service_DeleteWorker_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Service_PageTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PageTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).PageTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_PageTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).PageTask(ctx, req.(*PageTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_AddTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).AddTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_AddTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).AddTask(ctx, req.(*AddTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_UpdateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).UpdateTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_UpdateTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).UpdateTask(ctx, req.(*UpdateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_EnableTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnableTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).EnableTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_EnableTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).EnableTask(ctx, req.(*EnableTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_DisableTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DisableTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).DisableTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_DisableTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).DisableTask(ctx, req.(*DisableTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_DeleteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).DeleteTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_DeleteTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).DeleteTask(ctx, req.(*DeleteTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_CancelExecTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelExecTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).CancelExecTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_CancelExecTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).CancelExecTask(ctx, req.(*CancelExecTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_PageLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PageLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).PageLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_PageLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).PageLog(ctx, req.(*PageLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_GetLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).GetLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_GetLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).GetLog(ctx, req.(*GetLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Service_ServiceDesc is the grpc.ServiceDesc for Service service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -265,6 +694,22 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cron_server.Service",
 	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PageWorkerGroup",
+			Handler:    _Service_PageWorkerGroup_Handler,
+		},
+		{
+			MethodName: "AddWorkerGroup",
+			Handler:    _Service_AddWorkerGroup_Handler,
+		},
+		{
+			MethodName: "UpdateWorkerGroup",
+			Handler:    _Service_UpdateWorkerGroup_Handler,
+		},
+		{
+			MethodName: "DeleteWorkerGroup",
+			Handler:    _Service_DeleteWorkerGroup_Handler,
+		},
 		{
 			MethodName: "PageWorker",
 			Handler:    _Service_PageWorker_Handler,
@@ -278,16 +723,52 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Service_UpdateWorker_Handler,
 		},
 		{
-			MethodName: "OnlineWorker",
-			Handler:    _Service_OnlineWorker_Handler,
+			MethodName: "EnableWorker",
+			Handler:    _Service_EnableWorker_Handler,
 		},
 		{
-			MethodName: "OfflineWorker",
-			Handler:    _Service_OfflineWorker_Handler,
+			MethodName: "DisableWorker",
+			Handler:    _Service_DisableWorker_Handler,
 		},
 		{
 			MethodName: "DeleteWorker",
 			Handler:    _Service_DeleteWorker_Handler,
+		},
+		{
+			MethodName: "PageTask",
+			Handler:    _Service_PageTask_Handler,
+		},
+		{
+			MethodName: "AddTask",
+			Handler:    _Service_AddTask_Handler,
+		},
+		{
+			MethodName: "UpdateTask",
+			Handler:    _Service_UpdateTask_Handler,
+		},
+		{
+			MethodName: "EnableTask",
+			Handler:    _Service_EnableTask_Handler,
+		},
+		{
+			MethodName: "DisableTask",
+			Handler:    _Service_DisableTask_Handler,
+		},
+		{
+			MethodName: "DeleteTask",
+			Handler:    _Service_DeleteTask_Handler,
+		},
+		{
+			MethodName: "CancelExecTask",
+			Handler:    _Service_CancelExecTask_Handler,
+		},
+		{
+			MethodName: "PageLog",
+			Handler:    _Service_PageLog_Handler,
+		},
+		{
+			MethodName: "GetLog",
+			Handler:    _Service_GetLog_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

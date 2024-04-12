@@ -6,11 +6,13 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/go-kratos/kratos/v2 v2.7.2
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/google/uuid v1.6.0
 	github.com/limes-cloud/kratosx v1.0.27
 	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.32.0
+	gorm.io/gorm v1.25.6
 )
 
 require (
@@ -49,7 +51,6 @@ require (
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/handlers v1.5.2 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
@@ -121,7 +122,6 @@ require (
 	gorm.io/driver/mysql v1.5.2 // indirect
 	gorm.io/driver/postgres v1.5.3 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
-	gorm.io/gorm v1.25.6 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
 	modernc.org/libc v1.40.18 // indirect
 	modernc.org/mathutil v1.6.0 // indirect

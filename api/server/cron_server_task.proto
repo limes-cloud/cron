@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package cron_server;
+option go_package = "./v1;v1";
+
+import "validate/validate.proto";
+import "google/protobuf/struct.proto";
+
+message Task{
+  uint32 id = 1;
+  uint32 group_id =2;
+  string name = 3;
+  string tag = 4;
+  string spec = 5;
+  string  select_type = 6;
+  optional uint32 worker_group_id = 7;
+  optional uint32 worker_id = 8;
+  string  exec_type = 9;
+  string  exec_value = 10;
+  uint32  expect_code = 11;
+  uint32  retry_count = 12;
+  uint32  retry_wait_time = 13;
+  uint32  max_exec_time = 14;
+  string  status = 15;
+  string  description = 16;
+}
+
+message PageTaskRequest{
+  uint32 page = 1[(validate.rules).uint32 = {gt:0}];
+  uint32 page_size = 2[(validate.rules).uint32 = {lte:100}];
+  optional string tag = 3[(validate.rules).string = {min_len:1}];
+  optional string ip = 4[(validate.rules).string = {ip:true}];
+  optional string name = 5[(validate.rules).string = {min_len:1}];
+  optional bool status = 6;
+}
+
+message PageTaskReply{
+  uint32 total = 1;
+  repeated Task list = 2;
+}
+
+message AddTaskRequest{
+  uint32 group_id =1[(validate.rules).uint32 = {gt:0}];
+  string name = 2[(validate.rules).string = {min_len:1}];
+  string tag = 3[(validate.rules).string = {min_len:1}];
+  string spec = 4[(validate.rules).string = {min_len:1}];
+  string  select_type = 5[(validate.rules).string = {min_len:1}];
+  optional uint32 worker_group_id = 6[(validate.rules).uint32 = {gt:0}];
+  optional uint32 worker_id = 7[(validate.rules).uint32 = {gt:0}];
+  string  exec_type = 8[(validate.rules).string = {min_len:1}];
+  string  exec_value = 9[(validate.rules).string = {min_len:1}];
+  uint32  expect_code = 10[(validate.rules).uint32 = {gte:0}];
+  uint32  retry_count = 11[(validate.rules).uint32 = {gte:0}];
+  uint32  retry_wait_time = 12[(validate.rules).uint32 = {gte:0}];
+  uint32  max_exec_time = 13[(validate.rules).uint32 = {gte:0}];
+  string  description = 14;
+}
+
+message AddTaskReply{
+  uint32 id = 1;
+}
+
+message UpdateTaskRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+  uint32 group_id =2[(validate.rules).uint32 = {gt:0}];
+  string name = 3[(validate.rules).string = {min_len:1}];
+  string tag = 4[(validate.rules).string = {min_len:1}];
+  string spec = 5[(validate.rules).string = {min_len:1}];
+  string  select_type = 6[(validate.rules).string = {min_len:1}];
+  optional uint32 worker_group_id = 7[(validate.rules).uint32 = {gt:0}];
+  optional uint32 worker_id = 8[(validate.rules).uint32 = {gt:0}];
+  string  exec_type = 9[(validate.rules).string = {min_len:1}];
+  string  exec_value = 10[(validate.rules).string = {min_len:1}];
+  uint32  expect_code = 11[(validate.rules).uint32 = {gte:0}];
+  uint32  retry_count = 12[(validate.rules).uint32 = {gte:0}];
+  uint32  retry_wait_time = 13[(validate.rules).uint32 = {gte:0}];
+  uint32  max_exec_time = 14[(validate.rules).uint32 = {gte:0}];
+  string  description = 15;
+}
+
+message EnableTaskRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
+message DisableTaskRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
+message DeleteTaskRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
+message CancelExecTaskRequest{
+  string uuid = 1[(validate.rules).string = {min_len:1}];
+}

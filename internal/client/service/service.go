@@ -41,6 +41,7 @@ func (s *Service) ExecTask(req *v1.ExecTaskRequest, res v1.Service_ExecTaskServe
 		MaxExecTime:   req.MaxExecTime,
 		Uuid:          req.Uuid,
 	}
+
 	return s.task.ExecTask(
 		kratosx.MustContext(res.Context()),
 		task,

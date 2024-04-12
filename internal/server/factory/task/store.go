@@ -13,6 +13,7 @@ type store struct {
 
 const (
 	key = "cron:task:hash:spec"
+	// runningKey = "cron:task:running"
 )
 
 func (s *store) tid(id uint32) string {
@@ -20,7 +21,7 @@ func (s *store) tid(id uint32) string {
 }
 
 func (s *store) set(id uint32, spec string) {
-	s.rdb.HSet(context.Background(), key, s.tid(id), spec)
+	s.rdb.HSet(context.Background(), key, s.tid(id), spec).Result()
 }
 
 func (s *store) get(id uint32) string {

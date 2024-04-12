@@ -25,6 +25,7 @@ type watcher struct {
 	closer chan error
 	close  atomic.Bool
 	time   time.Time
+	err    error
 }
 
 type Factory struct {
@@ -39,20 +40,22 @@ var (
 )
 
 const (
-	defaultShell = "/bin/sh"
+	defaultErrorCode = 400
+	defaultShell     = "/bin/sh"
 
 	logInfo  = "info"
 	logError = "error"
 
 	startInfo = "开始进行第%d次执行任务，任务索引:%s"
-	errorInfo = "执行任务失败:%s"
+	errorInfo = "执行任务失败:"
 )
 
 func New(conf *conf.Config) *Factory {
 	once.Do(func() {
 		_f = &Factory{
-			conf: conf,
-			ws:   make(map[string]*watcher),
+			conf:  conf,
+			ws:    make(map[string]*watcher),
+			mutex: sync.RWMutex{},
 		}
 	})
 	return _f
@@ -62,7 +65,6 @@ func (f *Factory) CancelExecTask(uuid string) {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
 	wtr := f.ws[uuid]
-	fmt.Println("cancel", time.Now().Unix())
 	if wtr != nil && !wtr.close.Load() {
 		wtr.cancel()
 	}
@@ -72,6 +74,7 @@ func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskR
 	defer func() {
 		f.mutex.Lock()
 		if f.ws[task.Uuid] != nil && f.ws[task.Uuid].close.Load() && len(f.ws[task.Uuid].buf) == 0 {
+			close(f.ws[task.Uuid].closer)
 			delete(f.ws, task.Uuid)
 		}
 		f.mutex.Unlock()
@@ -100,6 +103,10 @@ func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskR
 			f.mutex.RUnlock()
 
 			itr.mutex.Lock()
+			if *index == len(itr.buf) {
+				wtr.close.Store(true)
+			}
+
 			if *index != 0 && ok {
 				itr.buf = itr.buf[*index:]
 			}
@@ -114,7 +121,11 @@ func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskR
 				return err
 			}
 		}
-		return <-wtr.closer
+
+		if !wtr.close.Load() {
+			return <-wtr.closer
+		}
+		return wtr.err
 	}
 
 	closer := make(chan error, 1)
@@ -130,7 +141,8 @@ func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskR
 	f.mutex.Unlock()
 
 	f.exec(kratosx.MustContext(childCtx), task, wtr)
-	return <-closer
+	wtr.err = <-closer
+	return wtr.err
 }
 
 func (f *Factory) reply(uuid string, tp string, text string) {
@@ -153,6 +165,7 @@ func (f *Factory) reply(uuid string, tp string, text string) {
 func (f *Factory) exec(ctx kratosx.Context, task *biz.Task, wtr *watcher) {
 	var (
 		err   error
+		code  = defaultErrorCode
 		count = int(task.RetryCount) + 1
 	)
 
@@ -163,17 +176,24 @@ func (f *Factory) exec(ctx kratosx.Context, task *biz.Task, wtr *watcher) {
 			c, _ := context.WithTimeout(ctx, time.Duration(task.MaxExecTime)*time.Second)
 			childCtx = kratosx.MustContext(c)
 		}
+
+		var ()
 		switch task.Type {
 		case "shell":
-			err = f.shell(childCtx, task)
+			code, err = f.shell(childCtx, task)
 		default:
 			err = errors.New("不支持的任务类型")
 		}
-		if err == nil {
+
+		if err == nil && int(task.ExpectCode) == code {
 			break
 		}
 
-		f.reply(task.Uuid, logError, fmt.Sprintf(errorInfo, err.Error()))
+		if err == nil && code != int(task.ExpectCode) {
+			err = fmt.Errorf("code %d not eq expect_code %d", code, task.ExpectCode)
+		}
+		f.reply(task.Uuid, logError, errorInfo+err.Error())
+
 		if task.RetryWaitTime != 0 {
 			time.Sleep(time.Duration(task.RetryWaitTime) * time.Second)
 		}
@@ -182,27 +202,28 @@ func (f *Factory) exec(ctx kratosx.Context, task *biz.Task, wtr *watcher) {
 	wtr.mutex.Lock()
 	defer func() {
 		wtr.close.Store(true)
-		close(wtr.closer)
 		wtr.mutex.Unlock()
 	}()
 	wtr.closer <- err
 }
 
-func (f *Factory) shell(ctx kratosx.Context, task *biz.Task) error {
+func (f *Factory) shell(ctx kratosx.Context, task *biz.Task) (int, error) {
 	shell := f.conf.Shell
 	if shell == "" {
 		shell = defaultShell
 	}
 
+	code := defaultErrorCode
+
 	tpFile, err := os.CreateTemp("", "*.sh")
 	if err != nil {
-		return err
+		return code, err
 	}
 	if _, err = tpFile.WriteString(task.Value); err != nil {
-		return err
+		return code, err
 	}
 	if err := tpFile.Sync(); err != nil {
-		return err
+		return code, err
 	}
 
 	defer func() {
@@ -213,12 +234,12 @@ func (f *Factory) shell(ctx kratosx.Context, task *biz.Task) error {
 	cmd := exec.CommandContext(ctx, shell, tpFile.Name())
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return code, err
 	}
 
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
-		return err
+		return code, err
 	}
 
 	go func() {
@@ -236,8 +257,15 @@ func (f *Factory) shell(ctx kratosx.Context, task *biz.Task) error {
 	}()
 
 	if err := cmd.Start(); err != nil {
-		return err
+		return code, err
 	}
 
-	return cmd.Wait()
+	if err := cmd.Wait(); err != nil {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			return exitErr.ExitCode(), nil
+		}
+		return defaultErrorCode, err
+	}
+	return 0, nil
 }

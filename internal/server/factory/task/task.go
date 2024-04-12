@@ -5,20 +5,27 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"math/rand"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 	"github.com/limes-cloud/kratosx"
 
-	"github.com/limes-cloud/cron/internal/server/biz/task"
-	"github.com/limes-cloud/cron/internal/server/biz/worker"
+	clientV1 "github.com/limes-cloud/cron/api/client/v1"
+	apierrors "github.com/limes-cloud/cron/api/errors"
+	"github.com/limes-cloud/cron/internal/server/biz"
 	"github.com/limes-cloud/cron/internal/server/pkg/cron"
 )
 
 const (
+	maxWaitTime = 10
+
 	taskLockPrefix   = "cron:task:lock:"
 	subscribeChannel = "cron:subscribe:channel"
 
@@ -33,10 +40,9 @@ var (
 )
 
 type Repo interface {
-	GetSpecs(ctx kratosx.Context) map[uint32]string
-	GetTask(ctx kratosx.Context, id uint32) (*task.Task, error)
-	GetWorkerByGroupId(ctx kratosx.Context, id uint32) (*worker.Worker, error)
-	GetWorker(ctx kratosx.Context, id uint32) (*worker.Worker, error)
+	biz.WorkerRepo
+	biz.TaskRepo
+	biz.LogRepo
 }
 
 type Factory struct {
@@ -76,31 +82,36 @@ type message struct {
 	Spec string `json:"spec"`
 }
 
-func (t *Factory) AddCron(ctx kratosx.Context, id uint32, spec string) error {
+func (t *Factory) DrySpec(s string) bool {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (t *Factory) AddCron(id uint32, spec string) error {
 	if t.store.get(id) != "" {
 		return errors.New("id exist")
 	}
 	if err := t.cron.ValidateSpec(spec); err != nil {
 		return err
 	}
-	return t.publish(ctx, &message{ID: id, Spec: spec, Type: add})
+	return t.publish(t.ctx, &message{ID: id, Spec: spec, Type: add})
 }
 
-func (t *Factory) RemoveCron(ctx kratosx.Context, id uint32) error {
+func (t *Factory) RemoveCron(id uint32) error {
 	if t.store.get(id) == "" {
 		return nil
 	}
-	return t.publish(ctx, &message{ID: id, Type: remove})
+	return t.publish(t.ctx, &message{ID: id, Type: remove})
 }
 
-func (t *Factory) UpdateCron(ctx kratosx.Context, id uint32, spec string) error {
+func (t *Factory) UpdateCron(id uint32, spec string) error {
 	if t.store.get(id) == "" {
 		return errors.New("id not exist")
 	}
 	if err := t.cron.ValidateSpec(spec); err != nil {
 		return err
 	}
-	return t.publish(ctx, &message{ID: id, Spec: spec, Type: update})
+	return t.publish(t.ctx, &message{ID: id, Spec: spec, Type: update})
 }
 
 func (t *Factory) start() {
@@ -179,10 +190,11 @@ func (t *Factory) lockScheduler(id uint32, spec string) func() {
 
 		key := fmt.Sprintf("%s%d", taskLockPrefix, id)
 		if is, _ := t.rdb.SetNX(context.Background(), key, 1, expire).Result(); is {
-			// 放回重新执行的队列中进行执行
 			if err := t.scheduler(id); err != nil {
+				t.log.Errorw("exec task error", err.Error())
+				// todo 故障转移
+				return
 			}
-
 		}
 	}
 }
@@ -195,9 +207,9 @@ func (t *Factory) scheduler(id uint32) error {
 	}
 
 	var (
-		wk *worker.Worker
+		wk *biz.Worker
 	)
-	if tk.ExecType == task.ExecTypeGroupWorker {
+	if tk.ExecType == biz.ExecTypeGroup {
 		wk, err = t.repo.GetWorkerByGroupId(t.ctx, *tk.WorkerGroupId)
 	} else {
 		wk, err = t.repo.GetWorker(t.ctx, *tk.WorkerId)
@@ -206,9 +218,77 @@ func (t *Factory) scheduler(id uint32) error {
 		return err
 	}
 
+	uid := uuid.NewString()
+	if _, err := t.repo.AddLog(t.ctx, t.makeLog(uid, tk, wk)); err != nil {
+		return err
+	}
+
 	// 连接worker
-	return nil
-	// 发送执行任务
+	ctx := context.Background()
+	conn, err := grpc.DialInsecure(ctx, grpc.WithEndpoint(wk.IP))
+	if err != nil {
+		return err
+	}
+
+	client := clientV1.NewServiceClient(conn)
+	req := &clientV1.ExecTaskRequest{
+		Id:            tk.ID,
+		Type:          tk.ExecType,
+		Value:         tk.ExecValue,
+		ExpectCode:    tk.ExpectCode,
+		RetryCount:    tk.RetryCount,
+		RetryWaitTime: tk.RetryWaitTime,
+		MaxExecTime:   tk.MaxExecTime,
+		Uuid:          uid,
+	}
+	stream, err := client.ExecTask(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF || apierrors.IsExecTaskFail(err) {
+				if err == io.EOF {
+					err = nil
+				}
+				break
+			}
+
+			for t.repo.TaskIsRunning(t.ctx, uid) {
+				if stream, err = client.ExecTask(ctx, req); err == nil {
+					break
+				}
+				wt := rand.Intn(maxWaitTime)
+				time.Sleep(time.Duration(wt) * time.Second)
+			}
+		}
+
+		b, _ := json.Marshal(msg)
+		if err := t.repo.AppendLogContent(t.ctx, uid, string(b)); err != nil {
+			t.log.Errorw("append log error", err.Error())
+		}
+	}
+	if err := t.repo.UpdateLogStatus(t.ctx, uid, err); err != nil {
+		t.log.Errorw("update log status error", err.Error())
+	}
+	return err
+}
+
+func (t *Factory) makeLog(uuid string, task *biz.Task, worker *biz.Worker) *biz.Log {
+	tb, _ := json.Marshal(task)
+	wb, _ := json.Marshal(worker)
+
+	return &biz.Log{
+		Uuid:           uuid,
+		TaskId:         task.ID,
+		TaskSnapshot:   string(tb),
+		WorkerId:       worker.ID,
+		WorkerSnapshot: string(wb),
+		Start:          time.Now().Unix(),
+		Status:         biz.ExecRunning,
+	}
 }
 
 func (t *Factory) startRepair() {

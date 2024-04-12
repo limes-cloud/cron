@@ -7,6 +7,44 @@ option go_package = "./v1;v1";
 import "validate/validate.proto";
 import "google/protobuf/struct.proto";
 
+
+message WorkerGroup{
+  uint32 id = 1;
+  string name = 2;
+  string description = 3;
+  uint32 created_at = 4;
+  uint32 updated_at = 5;
+}
+
+message PageWorkerGroupRequest{
+  uint32 page = 1[(validate.rules).uint32 = {gt:0}];
+  uint32 page_size = 2[(validate.rules).uint32 = {lte:100}];
+}
+
+message PageWorkerGroupReply{
+  uint32 total = 1;
+  repeated WorkerGroup list = 2;
+}
+
+message AddWorkerGroupRequest{
+  string name = 1[(validate.rules).string = {min_len:1}];
+  string description = 2[(validate.rules).string = {min_len:1}];
+}
+
+message AddWorkerGroupReply{
+  uint32 id = 1;
+}
+
+message UpdateWorkerGroupRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+  string name = 2[(validate.rules).string = {min_len:1}];
+  string description = 3[(validate.rules).string = {min_len:1}];
+}
+
+message DeleteWorkerGroupRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
 message Worker{
   uint32 id = 1;
   string name = 2;
@@ -51,18 +89,12 @@ message UpdateWorkerRequest{
   string description = 4[(validate.rules).string = {min_len:1}];
 }
 
-message OnlineWorkerRequest{
-  oneof params{
-    uint32 id = 1[(validate.rules).uint32 = {gt:0}];
-    string ip = 2[(validate.rules).string = {min_len:1}];
-  };
+message EnableWorkerRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
 }
 
-message OfflineWorkerRequest{
-  oneof params{
-    uint32 id = 1[(validate.rules).uint32 = {gt:0}];
-    string ip = 2[(validate.rules).string = {min_len:1}];
-  };
+message DisableWorkerRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
 }
 
 message DeleteWorkerRequest{

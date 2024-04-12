@@ -6,12 +6,42 @@ option go_package = "./v1;v1";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "cron_server_worker.proto";
+import "cron_server_task.proto";
+import "cron_server_log.proto";
 
 
 service Service {
+
+  rpc PageWorkerGroup(PageWorkerGroupRequest) returns(PageWorkerGroupReply){
+    option (google.api.http) = {
+      get: "/cron/v1/worker/groups",
+    };
+  }
+
+  rpc AddWorkerGroup(AddWorkerGroupRequest) returns(AddWorkerGroupReply){
+    option (google.api.http) = {
+      post: "/cron/v1/worker/group",
+      body: "*"
+    };
+  }
+
+  rpc UpdateWorkerGroup(UpdateWorkerGroupRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      put: "/cron/v1/worker/group",
+      body: "*"
+    };
+  }
+
+  rpc DeleteWorkerGroup(DeleteWorkerGroupRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/cron/v1/worker/group",
+      body: "*"
+    };
+  }
+
   rpc PageWorker(PageWorkerRequest) returns(PageWorkerReply){
     option (google.api.http) = {
-      get: "/cron/v1/worker",
+      get: "/cron/v1/workers",
     };
   }
 
@@ -29,16 +59,16 @@ service Service {
     };
   }
 
-  rpc OnlineWorker(UpdateWorkerRequest) returns(google.protobuf.Empty){
+  rpc EnableWorker(EnableWorkerRequest) returns(google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/cron/v1/worker/online",
+      post: "/cron/v1/worker/enable",
       body: "*"
     };
   }
 
-  rpc OfflineWorker(UpdateWorkerRequest) returns(google.protobuf.Empty){
+  rpc DisableWorker(DisableWorkerRequest) returns(google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/cron/v1/worker/offline",
+      post: "/cron/v1/worker/disable",
       body: "*"
     };
   }
@@ -50,4 +80,64 @@ service Service {
     };
   }
 
+
+  rpc PageTask(PageTaskRequest) returns(PageTaskReply){
+    option (google.api.http) = {
+      get: "/cron/v1/tasks",
+    };
+  }
+
+  rpc AddTask(AddTaskRequest) returns(AddTaskReply){
+    option (google.api.http) = {
+      post: "/cron/v1/task",
+      body: "*"
+    };
+  }
+
+  rpc UpdateTask(UpdateTaskRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      put: "/cron/v1/task",
+      body: "*"
+    };
+  }
+
+  rpc EnableTask(EnableTaskRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/cron/v1/task/enable",
+      body: "*"
+    };
+  }
+
+  rpc DisableTask(DisableTaskRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/cron/v1/task/disable",
+      body: "*"
+    };
+  }
+
+  rpc DeleteTask(DeleteTaskRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/cron/v1/task",
+      body: "*"
+    };
+  }
+
+  rpc CancelExecTask(CancelExecTaskRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/cron/v1/task/cancel",
+      body: "*"
+    };
+  }
+
+  rpc PageLog(PageLogRequest) returns(PageLogReply){
+    option (google.api.http) = {
+      get: "/cron/v1/logs",
+    };
+  }
+
+  rpc GetLog(GetLogRequest) returns(Log){
+    option (google.api.http) = {
+      get: "/cron/v1/logs",
+    };
+  }
 }

@@ -16,15 +16,15 @@ func IsNotFound(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_NotFound.String() && e.Code == 200
+	return e.Reason == ErrorReason_NotFound.String() && e.Code == 400
 }
 
 func NotFoundFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_NotFound.String(), "数据不存在:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_NotFound.String(), "数据不存在:"+fmt.Sprintf(format, args...))
 }
 
 func NotFound() *errors.Error {
-	return errors.New(200, ErrorReason_NotFound.String(), "数据不存在")
+	return errors.New(400, ErrorReason_NotFound.String(), "数据不存在")
 }
 
 func IsDatabase(err error) bool {
@@ -32,15 +32,15 @@ func IsDatabase(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_Database.String() && e.Code == 200
+	return e.Reason == ErrorReason_Database.String() && e.Code == 400
 }
 
 func DatabaseFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_Database.String(), "数据库错误:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_Database.String(), "数据库错误:"+fmt.Sprintf(format, args...))
 }
 
 func Database() *errors.Error {
-	return errors.New(200, ErrorReason_Database.String(), "数据库错误")
+	return errors.New(400, ErrorReason_Database.String(), "数据库错误")
 }
 
 func IsTransform(err error) bool {
@@ -48,15 +48,15 @@ func IsTransform(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_Transform.String() && e.Code == 200
+	return e.Reason == ErrorReason_Transform.String() && e.Code == 400
 }
 
 func TransformFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_Transform.String(), "数据转换失败:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_Transform.String(), "数据转换失败:"+fmt.Sprintf(format, args...))
 }
 
 func Transform() *errors.Error {
-	return errors.New(200, ErrorReason_Transform.String(), "数据转换失败")
+	return errors.New(400, ErrorReason_Transform.String(), "数据转换失败")
 }
 
 func IsDeleteNotDisabledWorker(err error) bool {
@@ -64,15 +64,15 @@ func IsDeleteNotDisabledWorker(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_DeleteNotDisabledWorker.String() && e.Code == 200
+	return e.Reason == ErrorReason_DeleteNotDisabledWorker.String() && e.Code == 400
 }
 
 func DeleteNotDisabledWorkerFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_DeleteNotDisabledWorker.String(), "不能删除非未激活的节点:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_DeleteNotDisabledWorker.String(), "不能删除非未激活的节点:"+fmt.Sprintf(format, args...))
 }
 
 func DeleteNotDisabledWorker() *errors.Error {
-	return errors.New(200, ErrorReason_DeleteNotDisabledWorker.String(), "不能删除非未激活的节点")
+	return errors.New(400, ErrorReason_DeleteNotDisabledWorker.String(), "不能删除非未激活的节点")
 }
 
 func IsEnableNotDisabledWorker(err error) bool {
@@ -80,15 +80,15 @@ func IsEnableNotDisabledWorker(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_EnableNotDisabledWorker.String() && e.Code == 200
+	return e.Reason == ErrorReason_EnableNotDisabledWorker.String() && e.Code == 400
 }
 
 func EnableNotDisabledWorkerFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_EnableNotDisabledWorker.String(), "不能启动非未激活的节点:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_EnableNotDisabledWorker.String(), "不能启动非未激活的节点:"+fmt.Sprintf(format, args...))
 }
 
 func EnableNotDisabledWorker() *errors.Error {
-	return errors.New(200, ErrorReason_EnableNotDisabledWorker.String(), "不能启动非未激活的节点")
+	return errors.New(400, ErrorReason_EnableNotDisabledWorker.String(), "不能启动非未激活的节点")
 }
 
 func IsDisableNotEnableWorker(err error) bool {
@@ -96,15 +96,15 @@ func IsDisableNotEnableWorker(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_DisableNotEnableWorker.String() && e.Code == 200
+	return e.Reason == ErrorReason_DisableNotEnableWorker.String() && e.Code == 400
 }
 
 func DisableNotEnableWorkerFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_DisableNotEnableWorker.String(), "不能禁用非激活的节点:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_DisableNotEnableWorker.String(), "不能禁用非激活的节点:"+fmt.Sprintf(format, args...))
 }
 
 func DisableNotEnableWorker() *errors.Error {
-	return errors.New(200, ErrorReason_DisableNotEnableWorker.String(), "不能禁用非激活的节点")
+	return errors.New(400, ErrorReason_DisableNotEnableWorker.String(), "不能禁用非激活的节点")
 }
 
 func IsCronSpec(err error) bool {
@@ -112,15 +112,15 @@ func IsCronSpec(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_CronSpec.String() && e.Code == 200
+	return e.Reason == ErrorReason_CronSpec.String() && e.Code == 400
 }
 
 func CronSpecFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_CronSpec.String(), "定时表达式错误:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_CronSpec.String(), "定时表达式错误:"+fmt.Sprintf(format, args...))
 }
 
 func CronSpec() *errors.Error {
-	return errors.New(200, ErrorReason_CronSpec.String(), "定时表达式错误")
+	return errors.New(400, ErrorReason_CronSpec.String(), "定时表达式错误")
 }
 
 func IsEnableCron(err error) bool {
@@ -128,15 +128,15 @@ func IsEnableCron(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_EnableCron.String() && e.Code == 200
+	return e.Reason == ErrorReason_EnableCron.String() && e.Code == 400
 }
 
 func EnableCronFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_EnableCron.String(), "启用定时任务失败:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_EnableCron.String(), "启用定时任务失败:"+fmt.Sprintf(format, args...))
 }
 
 func EnableCron() *errors.Error {
-	return errors.New(200, ErrorReason_EnableCron.String(), "启用定时任务失败")
+	return errors.New(400, ErrorReason_EnableCron.String(), "启用定时任务失败")
 }
 
 func IsDisableCron(err error) bool {
@@ -144,15 +144,15 @@ func IsDisableCron(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_DisableCron.String() && e.Code == 200
+	return e.Reason == ErrorReason_DisableCron.String() && e.Code == 400
 }
 
 func DisableCronFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_DisableCron.String(), "启用定时任务失败:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_DisableCron.String(), "启用定时任务失败:"+fmt.Sprintf(format, args...))
 }
 
 func DisableCron() *errors.Error {
-	return errors.New(200, ErrorReason_DisableCron.String(), "启用定时任务失败")
+	return errors.New(400, ErrorReason_DisableCron.String(), "启用定时任务失败")
 }
 
 func IsDeleteNotDisabledTask(err error) bool {
@@ -160,15 +160,15 @@ func IsDeleteNotDisabledTask(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_DeleteNotDisabledTask.String() && e.Code == 200
+	return e.Reason == ErrorReason_DeleteNotDisabledTask.String() && e.Code == 400
 }
 
 func DeleteNotDisabledTaskFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_DeleteNotDisabledTask.String(), "不能删除非未激活的任务:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_DeleteNotDisabledTask.String(), "不能删除非未激活的任务:"+fmt.Sprintf(format, args...))
 }
 
 func DeleteNotDisabledTask() *errors.Error {
-	return errors.New(200, ErrorReason_DeleteNotDisabledTask.String(), "不能删除非未激活的任务")
+	return errors.New(400, ErrorReason_DeleteNotDisabledTask.String(), "不能删除非未激活的任务")
 }
 
 func IsEnableNotDisabledTask(err error) bool {
@@ -176,15 +176,15 @@ func IsEnableNotDisabledTask(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_EnableNotDisabledTask.String() && e.Code == 200
+	return e.Reason == ErrorReason_EnableNotDisabledTask.String() && e.Code == 400
 }
 
 func EnableNotDisabledTaskFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_EnableNotDisabledTask.String(), "不能启动非未激活的任务:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_EnableNotDisabledTask.String(), "不能启动非未激活的任务:"+fmt.Sprintf(format, args...))
 }
 
 func EnableNotDisabledTask() *errors.Error {
-	return errors.New(200, ErrorReason_EnableNotDisabledTask.String(), "不能启动非未激活的任务")
+	return errors.New(400, ErrorReason_EnableNotDisabledTask.String(), "不能启动非未激活的任务")
 }
 
 func IsDisableNotEnableTask(err error) bool {
@@ -192,15 +192,15 @@ func IsDisableNotEnableTask(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_DisableNotEnableTask.String() && e.Code == 200
+	return e.Reason == ErrorReason_DisableNotEnableTask.String() && e.Code == 400
 }
 
 func DisableNotEnableTaskFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_DisableNotEnableTask.String(), "不能禁用非激活的任务:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_DisableNotEnableTask.String(), "不能禁用非激活的任务:"+fmt.Sprintf(format, args...))
 }
 
 func DisableNotEnableTask() *errors.Error {
-	return errors.New(200, ErrorReason_DisableNotEnableTask.String(), "不能禁用非激活的任务")
+	return errors.New(400, ErrorReason_DisableNotEnableTask.String(), "不能禁用非激活的任务")
 }
 
 func IsUpdateNotEnableTask(err error) bool {
@@ -208,15 +208,15 @@ func IsUpdateNotEnableTask(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_UpdateNotEnableTask.String() && e.Code == 200
+	return e.Reason == ErrorReason_UpdateNotEnableTask.String() && e.Code == 400
 }
 
 func UpdateNotEnableTaskFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_UpdateNotEnableTask.String(), "不能更新非激活的任务:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_UpdateNotEnableTask.String(), "不能更新非激活的任务:"+fmt.Sprintf(format, args...))
 }
 
 func UpdateNotEnableTask() *errors.Error {
-	return errors.New(200, ErrorReason_UpdateNotEnableTask.String(), "不能更新非激活的任务")
+	return errors.New(400, ErrorReason_UpdateNotEnableTask.String(), "不能更新非激活的任务")
 }
 
 func IsNotSupportTaskType(err error) bool {
@@ -224,13 +224,45 @@ func IsNotSupportTaskType(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_NotSupportTaskType.String() && e.Code == 200
+	return e.Reason == ErrorReason_NotSupportTaskType.String() && e.Code == 400
 }
 
 func NotSupportTaskTypeFormat(format string, args ...any) *errors.Error {
-	return errors.New(200, ErrorReason_NotSupportTaskType.String(), "错误的任务类型:"+fmt.Sprintf(format, args...))
+	return errors.New(400, ErrorReason_NotSupportTaskType.String(), "错误的任务类型:"+fmt.Sprintf(format, args...))
 }
 
 func NotSupportTaskType() *errors.Error {
-	return errors.New(200, ErrorReason_NotSupportTaskType.String(), "错误的任务类型")
+	return errors.New(400, ErrorReason_NotSupportTaskType.String(), "错误的任务类型")
+}
+
+func IsExecTaskFail(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ExecTaskFail.String() && e.Code == 400
+}
+
+func ExecTaskFailFormat(format string, args ...any) *errors.Error {
+	return errors.New(400, ErrorReason_ExecTaskFail.String(), "执行任务失败:"+fmt.Sprintf(format, args...))
+}
+
+func ExecTaskFail() *errors.Error {
+	return errors.New(400, ErrorReason_ExecTaskFail.String(), "执行任务失败")
+}
+
+func IsWorkerNotAvailable(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_WorkerNotAvailable.String() && e.Code == 400
+}
+
+func WorkerNotAvailableFormat(format string, args ...any) *errors.Error {
+	return errors.New(400, ErrorReason_WorkerNotAvailable.String(), "节点不可用:"+fmt.Sprintf(format, args...))
+}
+
+func WorkerNotAvailable() *errors.Error {
+	return errors.New(400, ErrorReason_WorkerNotAvailable.String(), "节点不可用")
 }

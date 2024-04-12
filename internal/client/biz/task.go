@@ -3,8 +3,22 @@ package biz
 import (
 	"github.com/limes-cloud/kratosx"
 
+	"github.com/limes-cloud/cron/api/errors"
 	"github.com/limes-cloud/cron/internal/client/conf"
 )
+
+type TaskFactory interface {
+	ExecTask(ctx kratosx.Context, task *Task, fn ExecTaskReplyFunc) error
+	CancelExecTask(uuid string)
+}
+
+type ExecTaskReply struct {
+	Type    string `json:"type"`
+	Content string `json:"content"`
+	Time    uint32 `json:"time"`
+}
+
+type ExecTaskReplyFunc func(*ExecTaskReply) error
 
 type Task struct {
 	Id            uint32
@@ -17,11 +31,6 @@ type Task struct {
 	MaxExecTime   uint32
 }
 
-type TaskFactory interface {
-	ExecTask(ctx kratosx.Context, task *Task, fn ExecTaskReplyFunc) error
-	CancelExecTask(uuid string)
-}
-
 type TaskUseCase struct {
 	config  *conf.Config
 	factory TaskFactory
@@ -32,7 +41,10 @@ func NewTaskUseCase(config *conf.Config, factory TaskFactory) *TaskUseCase {
 }
 
 func (uc *TaskUseCase) ExecTask(ctx kratosx.Context, task *Task, fn ExecTaskReplyFunc) error {
-	return uc.factory.ExecTask(ctx, task, fn)
+	if err := uc.factory.ExecTask(ctx, task, fn); err != nil {
+		return errors.ExecTaskFailFormat(err.Error())
+	}
+	return nil
 }
 
 func (uc *TaskUseCase) CancelExecTask(uuid string) {

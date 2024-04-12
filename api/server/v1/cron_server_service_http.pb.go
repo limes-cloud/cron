@@ -20,30 +20,154 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationServiceAddTask = "/cron_server.Service/AddTask"
 const OperationServiceAddWorker = "/cron_server.Service/AddWorker"
+const OperationServiceAddWorkerGroup = "/cron_server.Service/AddWorkerGroup"
+const OperationServiceCancelExecTask = "/cron_server.Service/CancelExecTask"
+const OperationServiceDeleteTask = "/cron_server.Service/DeleteTask"
 const OperationServiceDeleteWorker = "/cron_server.Service/DeleteWorker"
-const OperationServiceOfflineWorker = "/cron_server.Service/OfflineWorker"
-const OperationServiceOnlineWorker = "/cron_server.Service/OnlineWorker"
+const OperationServiceDeleteWorkerGroup = "/cron_server.Service/DeleteWorkerGroup"
+const OperationServiceDisableTask = "/cron_server.Service/DisableTask"
+const OperationServiceDisableWorker = "/cron_server.Service/DisableWorker"
+const OperationServiceEnableTask = "/cron_server.Service/EnableTask"
+const OperationServiceEnableWorker = "/cron_server.Service/EnableWorker"
+const OperationServiceGetLog = "/cron_server.Service/GetLog"
+const OperationServicePageLog = "/cron_server.Service/PageLog"
+const OperationServicePageTask = "/cron_server.Service/PageTask"
 const OperationServicePageWorker = "/cron_server.Service/PageWorker"
+const OperationServicePageWorkerGroup = "/cron_server.Service/PageWorkerGroup"
+const OperationServiceUpdateTask = "/cron_server.Service/UpdateTask"
 const OperationServiceUpdateWorker = "/cron_server.Service/UpdateWorker"
+const OperationServiceUpdateWorkerGroup = "/cron_server.Service/UpdateWorkerGroup"
 
 type ServiceHTTPServer interface {
+	AddTask(context.Context, *AddTaskRequest) (*AddTaskReply, error)
 	AddWorker(context.Context, *AddWorkerRequest) (*AddWorkerReply, error)
+	AddWorkerGroup(context.Context, *AddWorkerGroupRequest) (*AddWorkerGroupReply, error)
+	CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error)
+	DeleteTask(context.Context, *DeleteTaskRequest) (*emptypb.Empty, error)
 	DeleteWorker(context.Context, *DeleteWorkerRequest) (*emptypb.Empty, error)
-	OfflineWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error)
-	OnlineWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error)
+	DeleteWorkerGroup(context.Context, *DeleteWorkerGroupRequest) (*emptypb.Empty, error)
+	DisableTask(context.Context, *DisableTaskRequest) (*emptypb.Empty, error)
+	DisableWorker(context.Context, *DisableWorkerRequest) (*emptypb.Empty, error)
+	EnableTask(context.Context, *EnableTaskRequest) (*emptypb.Empty, error)
+	EnableWorker(context.Context, *EnableWorkerRequest) (*emptypb.Empty, error)
+	GetLog(context.Context, *GetLogRequest) (*Log, error)
+	PageLog(context.Context, *PageLogRequest) (*PageLogReply, error)
+	PageTask(context.Context, *PageTaskRequest) (*PageTaskReply, error)
 	PageWorker(context.Context, *PageWorkerRequest) (*PageWorkerReply, error)
+	PageWorkerGroup(context.Context, *PageWorkerGroupRequest) (*PageWorkerGroupReply, error)
+	UpdateTask(context.Context, *UpdateTaskRequest) (*emptypb.Empty, error)
 	UpdateWorker(context.Context, *UpdateWorkerRequest) (*emptypb.Empty, error)
+	UpdateWorkerGroup(context.Context, *UpdateWorkerGroupRequest) (*emptypb.Empty, error)
 }
 
 func RegisterServiceHTTPServer(s *http.Server, srv ServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/cron/v1/worker", _Service_PageWorker0_HTTP_Handler(srv))
+	r.GET("/cron/v1/worker/groups", _Service_PageWorkerGroup0_HTTP_Handler(srv))
+	r.POST("/cron/v1/worker/group", _Service_AddWorkerGroup0_HTTP_Handler(srv))
+	r.PUT("/cron/v1/worker/group", _Service_UpdateWorkerGroup0_HTTP_Handler(srv))
+	r.DELETE("/cron/v1/worker/group", _Service_DeleteWorkerGroup0_HTTP_Handler(srv))
+	r.GET("/cron/v1/workers", _Service_PageWorker0_HTTP_Handler(srv))
 	r.POST("/cron/v1/worker", _Service_AddWorker0_HTTP_Handler(srv))
 	r.PUT("/cron/v1/worker", _Service_UpdateWorker0_HTTP_Handler(srv))
-	r.POST("/cron/v1/worker/online", _Service_OnlineWorker0_HTTP_Handler(srv))
-	r.POST("/cron/v1/worker/offline", _Service_OfflineWorker0_HTTP_Handler(srv))
+	r.POST("/cron/v1/worker/enable", _Service_EnableWorker0_HTTP_Handler(srv))
+	r.POST("/cron/v1/worker/disable", _Service_DisableWorker0_HTTP_Handler(srv))
 	r.DELETE("/cron/v1/worker", _Service_DeleteWorker0_HTTP_Handler(srv))
+	r.GET("/cron/v1/tasks", _Service_PageTask0_HTTP_Handler(srv))
+	r.POST("/cron/v1/task", _Service_AddTask0_HTTP_Handler(srv))
+	r.PUT("/cron/v1/task", _Service_UpdateTask0_HTTP_Handler(srv))
+	r.POST("/cron/v1/task/enable", _Service_EnableTask0_HTTP_Handler(srv))
+	r.POST("/cron/v1/task/disable", _Service_DisableTask0_HTTP_Handler(srv))
+	r.DELETE("/cron/v1/task", _Service_DeleteTask0_HTTP_Handler(srv))
+	r.POST("/cron/v1/task/cancel", _Service_CancelExecTask0_HTTP_Handler(srv))
+	r.GET("/cron/v1/logs", _Service_PageLog0_HTTP_Handler(srv))
+	r.GET("/cron/v1/logs", _Service_GetLog0_HTTP_Handler(srv))
+}
+
+func _Service_PageWorkerGroup0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in PageWorkerGroupRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServicePageWorkerGroup)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.PageWorkerGroup(ctx, req.(*PageWorkerGroupRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PageWorkerGroupReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_AddWorkerGroup0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AddWorkerGroupRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceAddWorkerGroup)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.AddWorkerGroup(ctx, req.(*AddWorkerGroupRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AddWorkerGroupReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_UpdateWorkerGroup0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateWorkerGroupRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceUpdateWorkerGroup)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.UpdateWorkerGroup(ctx, req.(*UpdateWorkerGroupRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_DeleteWorkerGroup0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteWorkerGroupRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceDeleteWorkerGroup)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.DeleteWorkerGroup(ctx, req.(*DeleteWorkerGroupRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
 }
 
 func _Service_PageWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
@@ -109,18 +233,18 @@ func _Service_UpdateWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Co
 	}
 }
 
-func _Service_OnlineWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+func _Service_EnableWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in UpdateWorkerRequest
+		var in EnableWorkerRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationServiceOnlineWorker)
+		http.SetOperation(ctx, OperationServiceEnableWorker)
 		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
-			return srv.OnlineWorker(ctx, req.(*UpdateWorkerRequest))
+			return srv.EnableWorker(ctx, req.(*EnableWorkerRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -131,18 +255,18 @@ func _Service_OnlineWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Co
 	}
 }
 
-func _Service_OfflineWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+func _Service_DisableWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in UpdateWorkerRequest
+		var in DisableWorkerRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationServiceOfflineWorker)
+		http.SetOperation(ctx, OperationServiceDisableWorker)
 		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
-			return srv.OfflineWorker(ctx, req.(*UpdateWorkerRequest))
+			return srv.DisableWorker(ctx, req.(*DisableWorkerRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -175,13 +299,215 @@ func _Service_DeleteWorker0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Co
 	}
 }
 
+func _Service_PageTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in PageTaskRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServicePageTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.PageTask(ctx, req.(*PageTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PageTaskReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_AddTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AddTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceAddTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.AddTask(ctx, req.(*AddTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AddTaskReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_UpdateTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceUpdateTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.UpdateTask(ctx, req.(*UpdateTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_EnableTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EnableTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceEnableTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.EnableTask(ctx, req.(*EnableTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_DisableTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DisableTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceDisableTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.DisableTask(ctx, req.(*DisableTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_DeleteTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceDeleteTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.DeleteTask(ctx, req.(*DeleteTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_CancelExecTask0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CancelExecTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceCancelExecTask)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.CancelExecTask(ctx, req.(*CancelExecTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_PageLog0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in PageLogRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServicePageLog)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.PageLog(ctx, req.(*PageLogRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PageLogReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Service_GetLog0_HTTP_Handler(srv ServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetLogRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServiceGetLog)
+		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+			return srv.GetLog(ctx, req.(*GetLogRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Log)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ServiceHTTPClient interface {
+	AddTask(ctx context.Context, req *AddTaskRequest, opts ...http.CallOption) (rsp *AddTaskReply, err error)
 	AddWorker(ctx context.Context, req *AddWorkerRequest, opts ...http.CallOption) (rsp *AddWorkerReply, err error)
+	AddWorkerGroup(ctx context.Context, req *AddWorkerGroupRequest, opts ...http.CallOption) (rsp *AddWorkerGroupReply, err error)
+	CancelExecTask(ctx context.Context, req *CancelExecTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeleteTask(ctx context.Context, req *DeleteTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteWorker(ctx context.Context, req *DeleteWorkerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	OfflineWorker(ctx context.Context, req *UpdateWorkerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	OnlineWorker(ctx context.Context, req *UpdateWorkerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeleteWorkerGroup(ctx context.Context, req *DeleteWorkerGroupRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DisableTask(ctx context.Context, req *DisableTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DisableWorker(ctx context.Context, req *DisableWorkerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	EnableTask(ctx context.Context, req *EnableTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	EnableWorker(ctx context.Context, req *EnableWorkerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetLog(ctx context.Context, req *GetLogRequest, opts ...http.CallOption) (rsp *Log, err error)
+	PageLog(ctx context.Context, req *PageLogRequest, opts ...http.CallOption) (rsp *PageLogReply, err error)
+	PageTask(ctx context.Context, req *PageTaskRequest, opts ...http.CallOption) (rsp *PageTaskReply, err error)
 	PageWorker(ctx context.Context, req *PageWorkerRequest, opts ...http.CallOption) (rsp *PageWorkerReply, err error)
+	PageWorkerGroup(ctx context.Context, req *PageWorkerGroupRequest, opts ...http.CallOption) (rsp *PageWorkerGroupReply, err error)
+	UpdateTask(ctx context.Context, req *UpdateTaskRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	UpdateWorker(ctx context.Context, req *UpdateWorkerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateWorkerGroup(ctx context.Context, req *UpdateWorkerGroupRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
 type ServiceHTTPClientImpl struct {
@@ -192,6 +518,19 @@ func NewServiceHTTPClient(client *http.Client) ServiceHTTPClient {
 	return &ServiceHTTPClientImpl{client}
 }
 
+func (c *ServiceHTTPClientImpl) AddTask(ctx context.Context, in *AddTaskRequest, opts ...http.CallOption) (*AddTaskReply, error) {
+	var out AddTaskReply
+	pattern := "/cron/v1/task"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceAddTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *ServiceHTTPClientImpl) AddWorker(ctx context.Context, in *AddWorkerRequest, opts ...http.CallOption) (*AddWorkerReply, error) {
 	var out AddWorkerReply
 	pattern := "/cron/v1/worker"
@@ -199,6 +538,45 @@ func (c *ServiceHTTPClientImpl) AddWorker(ctx context.Context, in *AddWorkerRequ
 	opts = append(opts, http.Operation(OperationServiceAddWorker))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) AddWorkerGroup(ctx context.Context, in *AddWorkerGroupRequest, opts ...http.CallOption) (*AddWorkerGroupReply, error) {
+	var out AddWorkerGroupReply
+	pattern := "/cron/v1/worker/group"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceAddWorkerGroup))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/task/cancel"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceCancelExecTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/task"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceDeleteTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -218,11 +596,24 @@ func (c *ServiceHTTPClientImpl) DeleteWorker(ctx context.Context, in *DeleteWork
 	return &out, err
 }
 
-func (c *ServiceHTTPClientImpl) OfflineWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *ServiceHTTPClientImpl) DeleteWorkerGroup(ctx context.Context, in *DeleteWorkerGroupRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/cron/v1/worker/offline"
+	pattern := "/cron/v1/worker/group"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationServiceOfflineWorker))
+	opts = append(opts, http.Operation(OperationServiceDeleteWorkerGroup))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) DisableTask(ctx context.Context, in *DisableTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/task/disable"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceDisableTask))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -231,13 +622,78 @@ func (c *ServiceHTTPClientImpl) OfflineWorker(ctx context.Context, in *UpdateWor
 	return &out, err
 }
 
-func (c *ServiceHTTPClientImpl) OnlineWorker(ctx context.Context, in *UpdateWorkerRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *ServiceHTTPClientImpl) DisableWorker(ctx context.Context, in *DisableWorkerRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
-	pattern := "/cron/v1/worker/online"
+	pattern := "/cron/v1/worker/disable"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationServiceOnlineWorker))
+	opts = append(opts, http.Operation(OperationServiceDisableWorker))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) EnableTask(ctx context.Context, in *EnableTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/task/enable"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceEnableTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) EnableWorker(ctx context.Context, in *EnableWorkerRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/worker/enable"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceEnableWorker))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) GetLog(ctx context.Context, in *GetLogRequest, opts ...http.CallOption) (*Log, error) {
+	var out Log
+	pattern := "/cron/v1/logs"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationServiceGetLog))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) PageLog(ctx context.Context, in *PageLogRequest, opts ...http.CallOption) (*PageLogReply, error) {
+	var out PageLogReply
+	pattern := "/cron/v1/logs"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationServicePageLog))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) PageTask(ctx context.Context, in *PageTaskRequest, opts ...http.CallOption) (*PageTaskReply, error) {
+	var out PageTaskReply
+	pattern := "/cron/v1/tasks"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationServicePageTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,11 +702,37 @@ func (c *ServiceHTTPClientImpl) OnlineWorker(ctx context.Context, in *UpdateWork
 
 func (c *ServiceHTTPClientImpl) PageWorker(ctx context.Context, in *PageWorkerRequest, opts ...http.CallOption) (*PageWorkerReply, error) {
 	var out PageWorkerReply
-	pattern := "/cron/v1/worker"
+	pattern := "/cron/v1/workers"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationServicePageWorker))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) PageWorkerGroup(ctx context.Context, in *PageWorkerGroupRequest, opts ...http.CallOption) (*PageWorkerGroupReply, error) {
+	var out PageWorkerGroupReply
+	pattern := "/cron/v1/worker/groups"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationServicePageWorkerGroup))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/task"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceUpdateTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -262,6 +744,19 @@ func (c *ServiceHTTPClientImpl) UpdateWorker(ctx context.Context, in *UpdateWork
 	pattern := "/cron/v1/worker"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationServiceUpdateWorker))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ServiceHTTPClientImpl) UpdateWorkerGroup(ctx context.Context, in *UpdateWorkerGroupRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/cron/v1/worker/group"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServiceUpdateWorkerGroup))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
