@@ -2,7 +2,6 @@ package biz
 
 import (
 	"github.com/limes-cloud/kratosx"
-	ktypes "github.com/limes-cloud/kratosx/types"
 
 	"github.com/limes-cloud/cron/api/errors"
 	"github.com/limes-cloud/cron/internal/server/conf"
@@ -18,16 +17,16 @@ type LogRepo interface {
 }
 
 type PageLogRequest struct {
-	Page     uint32
-	PageSize uint32
-	TaskId   uint32
+	Page     uint32 `json:"page"`
+	PageSize uint32 `json:"page_size"`
+	TaskId   uint32 `json:"task_id"`
 }
 
 type Log struct {
-	ktypes.BaseModel
+	ID             uint32 `json:"id"`
 	Uuid           string `json:"uuid"`
-	WorkerId       uint32 `json:"log_id"`
-	WorkerSnapshot string `json:"log_snapshot"`
+	WorkerId       uint32 `json:"worker_id"`
+	WorkerSnapshot string `json:"worker_snapshot"`
 	TaskId         uint32 `json:"task_id"`
 	TaskSnapshot   string `json:"task_snapshot"`
 	Start          int64  `json:"start"`
@@ -44,6 +43,7 @@ type LogUseCase struct {
 const (
 	ExecRunning = "running"
 	ExecFail    = "fail"
+	ExecCancel  = "cancel"
 	ExecSuccess = "success"
 )
 

@@ -170,7 +170,7 @@ func (f *Factory) exec(ctx kratosx.Context, task *biz.Task, wtr *watcher) {
 	)
 
 	for i := 0; i < count; i++ {
-		f.reply(task.Uuid, logInfo, fmt.Sprintf(startInfo, i, task.Uuid))
+		f.reply(task.Uuid, logInfo, fmt.Sprintf(startInfo, i+1, task.Uuid))
 		childCtx := ctx
 		if task.MaxExecTime != 0 {
 			c, _ := context.WithTimeout(ctx, time.Duration(task.MaxExecTime)*time.Second)

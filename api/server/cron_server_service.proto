@@ -12,7 +12,7 @@ import "cron_server_log.proto";
 
 service Service {
 
-  rpc PageWorkerGroup(PageWorkerGroupRequest) returns(PageWorkerGroupReply){
+  rpc AllWorkerGroup(google.protobuf.Empty) returns(AllWorkerGroupReply){
     option (google.api.http) = {
       get: "/cron/v1/worker/groups",
     };
@@ -35,7 +35,6 @@ service Service {
   rpc DeleteWorkerGroup(DeleteWorkerGroupRequest) returns(google.protobuf.Empty){
     option (google.api.http) = {
       delete: "/cron/v1/worker/group",
-      body: "*"
     };
   }
 
@@ -76,10 +75,35 @@ service Service {
   rpc DeleteWorker(DeleteWorkerRequest) returns(google.protobuf.Empty){
     option (google.api.http) = {
       delete: "/cron/v1/worker",
+    };
+  }
+
+
+  rpc AllTaskGroup(google.protobuf.Empty) returns(AllTaskGroupReply){
+    option (google.api.http) = {
+      get: "/cron/v1/task/groups",
+    };
+  }
+
+  rpc AddTaskGroup(AddTaskGroupRequest) returns(AddTaskGroupReply){
+    option (google.api.http) = {
+      post: "/cron/v1/task/group",
       body: "*"
     };
   }
 
+  rpc UpdateTaskGroup(UpdateTaskGroupRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      put: "/cron/v1/task/group",
+      body: "*"
+    };
+  }
+
+  rpc DeleteTaskGroup(DeleteTaskGroupRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/cron/v1/task/group",
+    };
+  }
 
   rpc PageTask(PageTaskRequest) returns(PageTaskReply){
     option (google.api.http) = {
@@ -118,6 +142,12 @@ service Service {
   rpc DeleteTask(DeleteTaskRequest) returns(google.protobuf.Empty){
     option (google.api.http) = {
       delete: "/cron/v1/task",
+    };
+  }
+
+  rpc ExecTask(ExecTaskRequest) returns(google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/cron/v1/task/exec",
       body: "*"
     };
   }
@@ -137,7 +167,7 @@ service Service {
 
   rpc GetLog(GetLogRequest) returns(Log){
     option (google.api.http) = {
-      get: "/cron/v1/logs",
+      get: "/cron/v1/log",
     };
   }
 }

@@ -12,6 +12,47 @@ import (
 	"github.com/limes-cloud/cron/internal/server/biz"
 )
 
+func (s *Service) AllTaskGroup(ctx context.Context, _ *emptypb.Empty) (*v1.AllTaskGroupReply, error) {
+	list, err := s.task.AllTaskGroup(kratosx.MustContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	reply := v1.AllTaskGroupReply{}
+	if err := util.Transform(list, &reply.List); err != nil {
+		return nil, errors.Transform()
+	}
+
+	return &reply, nil
+}
+
+func (s *Service) AddTaskGroup(ctx context.Context, in *v1.AddTaskGroupRequest) (*v1.AddTaskGroupReply, error) {
+	wk := biz.TaskGroup{}
+	if err := util.Transform(in, &wk); err != nil {
+		return nil, errors.TransformFormat(err.Error())
+	}
+
+	id, err := s.task.AddTaskGroup(kratosx.MustContext(ctx), &wk)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.AddTaskGroupReply{Id: id}, nil
+}
+
+func (s *Service) UpdateTaskGroup(ctx context.Context, in *v1.UpdateTaskGroupRequest) (*emptypb.Empty, error) {
+	wk := biz.TaskGroup{}
+	if err := util.Transform(in, &wk); err != nil {
+		return nil, errors.TransformFormat(err.Error())
+	}
+
+	return nil, s.task.UpdateTaskGroup(kratosx.MustContext(ctx), &wk)
+}
+
+func (s *Service) DeleteTaskGroup(ctx context.Context, in *v1.DeleteTaskGroupRequest) (*emptypb.Empty, error) {
+	return nil, s.task.DeleteTaskGroup(kratosx.MustContext(ctx), in.Id)
+}
+
 func (s *Service) PageTask(ctx context.Context, in *v1.PageTaskRequest) (*v1.PageTaskReply, error) {
 	var req biz.PageTaskRequest
 	if err := util.Transform(in, &req); err != nil {
@@ -64,6 +105,10 @@ func (s *Service) DisableTask(ctx context.Context, in *v1.DisableTaskRequest) (*
 
 func (s *Service) CancelExecTask(ctx context.Context, in *v1.CancelExecTaskRequest) (*emptypb.Empty, error) {
 	return nil, s.task.CancelTask(kratosx.MustContext(ctx), in.Uuid)
+}
+
+func (s *Service) ExecTask(ctx context.Context, in *v1.ExecTaskRequest) (*emptypb.Empty, error) {
+	return nil, s.task.ExecTask(kratosx.MustContext(ctx), in.Id)
 }
 
 func (s *Service) DeleteTask(ctx context.Context, in *v1.DeleteTaskRequest) (*emptypb.Empty, error) {

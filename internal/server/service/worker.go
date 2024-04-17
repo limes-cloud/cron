@@ -12,18 +12,13 @@ import (
 	"github.com/limes-cloud/cron/internal/server/biz"
 )
 
-func (s *Service) PageWorkerGroup(ctx context.Context, in *v1.PageWorkerGroupRequest) (*v1.PageWorkerGroupReply, error) {
-	var req biz.PageWorkerGroupRequest
-	if err := util.Transform(in, &req); err != nil {
-		return nil, errors.Transform()
-	}
-
-	list, total, err := s.worker.PageWorkerGroup(kratosx.MustContext(ctx), &req)
+func (s *Service) AllWorkerGroup(ctx context.Context, _ *emptypb.Empty) (*v1.AllWorkerGroupReply, error) {
+	list, err := s.worker.AllWorkerGroup(kratosx.MustContext(ctx))
 	if err != nil {
 		return nil, err
 	}
 
-	reply := v1.PageWorkerGroupReply{Total: total}
+	reply := v1.AllWorkerGroupReply{}
 	if err := util.Transform(list, &reply.List); err != nil {
 		return nil, errors.Transform()
 	}

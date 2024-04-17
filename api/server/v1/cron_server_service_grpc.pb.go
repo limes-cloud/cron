@@ -20,7 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Service_PageWorkerGroup_FullMethodName   = "/cron_server.Service/PageWorkerGroup"
+	Service_AllWorkerGroup_FullMethodName    = "/cron_server.Service/AllWorkerGroup"
 	Service_AddWorkerGroup_FullMethodName    = "/cron_server.Service/AddWorkerGroup"
 	Service_UpdateWorkerGroup_FullMethodName = "/cron_server.Service/UpdateWorkerGroup"
 	Service_DeleteWorkerGroup_FullMethodName = "/cron_server.Service/DeleteWorkerGroup"
@@ -30,12 +30,17 @@ const (
 	Service_EnableWorker_FullMethodName      = "/cron_server.Service/EnableWorker"
 	Service_DisableWorker_FullMethodName     = "/cron_server.Service/DisableWorker"
 	Service_DeleteWorker_FullMethodName      = "/cron_server.Service/DeleteWorker"
+	Service_AllTaskGroup_FullMethodName      = "/cron_server.Service/AllTaskGroup"
+	Service_AddTaskGroup_FullMethodName      = "/cron_server.Service/AddTaskGroup"
+	Service_UpdateTaskGroup_FullMethodName   = "/cron_server.Service/UpdateTaskGroup"
+	Service_DeleteTaskGroup_FullMethodName   = "/cron_server.Service/DeleteTaskGroup"
 	Service_PageTask_FullMethodName          = "/cron_server.Service/PageTask"
 	Service_AddTask_FullMethodName           = "/cron_server.Service/AddTask"
 	Service_UpdateTask_FullMethodName        = "/cron_server.Service/UpdateTask"
 	Service_EnableTask_FullMethodName        = "/cron_server.Service/EnableTask"
 	Service_DisableTask_FullMethodName       = "/cron_server.Service/DisableTask"
 	Service_DeleteTask_FullMethodName        = "/cron_server.Service/DeleteTask"
+	Service_ExecTask_FullMethodName          = "/cron_server.Service/ExecTask"
 	Service_CancelExecTask_FullMethodName    = "/cron_server.Service/CancelExecTask"
 	Service_PageLog_FullMethodName           = "/cron_server.Service/PageLog"
 	Service_GetLog_FullMethodName            = "/cron_server.Service/GetLog"
@@ -45,7 +50,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ServiceClient interface {
-	PageWorkerGroup(ctx context.Context, in *PageWorkerGroupRequest, opts ...grpc.CallOption) (*PageWorkerGroupReply, error)
+	AllWorkerGroup(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllWorkerGroupReply, error)
 	AddWorkerGroup(ctx context.Context, in *AddWorkerGroupRequest, opts ...grpc.CallOption) (*AddWorkerGroupReply, error)
 	UpdateWorkerGroup(ctx context.Context, in *UpdateWorkerGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteWorkerGroup(ctx context.Context, in *DeleteWorkerGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -55,12 +60,17 @@ type ServiceClient interface {
 	EnableWorker(ctx context.Context, in *EnableWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DisableWorker(ctx context.Context, in *DisableWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteWorker(ctx context.Context, in *DeleteWorkerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AllTaskGroup(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllTaskGroupReply, error)
+	AddTaskGroup(ctx context.Context, in *AddTaskGroupRequest, opts ...grpc.CallOption) (*AddTaskGroupReply, error)
+	UpdateTaskGroup(ctx context.Context, in *UpdateTaskGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteTaskGroup(ctx context.Context, in *DeleteTaskGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PageTask(ctx context.Context, in *PageTaskRequest, opts ...grpc.CallOption) (*PageTaskReply, error)
 	AddTask(ctx context.Context, in *AddTaskRequest, opts ...grpc.CallOption) (*AddTaskReply, error)
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	EnableTask(ctx context.Context, in *EnableTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DisableTask(ctx context.Context, in *DisableTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ExecTask(ctx context.Context, in *ExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PageLog(ctx context.Context, in *PageLogRequest, opts ...grpc.CallOption) (*PageLogReply, error)
 	GetLog(ctx context.Context, in *GetLogRequest, opts ...grpc.CallOption) (*Log, error)
@@ -74,9 +84,9 @@ func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
 	return &serviceClient{cc}
 }
 
-func (c *serviceClient) PageWorkerGroup(ctx context.Context, in *PageWorkerGroupRequest, opts ...grpc.CallOption) (*PageWorkerGroupReply, error) {
-	out := new(PageWorkerGroupReply)
-	err := c.cc.Invoke(ctx, Service_PageWorkerGroup_FullMethodName, in, out, opts...)
+func (c *serviceClient) AllWorkerGroup(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllWorkerGroupReply, error) {
+	out := new(AllWorkerGroupReply)
+	err := c.cc.Invoke(ctx, Service_AllWorkerGroup_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +174,42 @@ func (c *serviceClient) DeleteWorker(ctx context.Context, in *DeleteWorkerReques
 	return out, nil
 }
 
+func (c *serviceClient) AllTaskGroup(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllTaskGroupReply, error) {
+	out := new(AllTaskGroupReply)
+	err := c.cc.Invoke(ctx, Service_AllTaskGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) AddTaskGroup(ctx context.Context, in *AddTaskGroupRequest, opts ...grpc.CallOption) (*AddTaskGroupReply, error) {
+	out := new(AddTaskGroupReply)
+	err := c.cc.Invoke(ctx, Service_AddTaskGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) UpdateTaskGroup(ctx context.Context, in *UpdateTaskGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_UpdateTaskGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) DeleteTaskGroup(ctx context.Context, in *DeleteTaskGroupRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_DeleteTaskGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *serviceClient) PageTask(ctx context.Context, in *PageTaskRequest, opts ...grpc.CallOption) (*PageTaskReply, error) {
 	out := new(PageTaskReply)
 	err := c.cc.Invoke(ctx, Service_PageTask_FullMethodName, in, out, opts...)
@@ -218,6 +264,15 @@ func (c *serviceClient) DeleteTask(ctx context.Context, in *DeleteTaskRequest, o
 	return out, nil
 }
 
+func (c *serviceClient) ExecTask(ctx context.Context, in *ExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Service_ExecTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *serviceClient) CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Service_CancelExecTask_FullMethodName, in, out, opts...)
@@ -249,7 +304,7 @@ func (c *serviceClient) GetLog(ctx context.Context, in *GetLogRequest, opts ...g
 // All implementations must embed UnimplementedServiceServer
 // for forward compatibility
 type ServiceServer interface {
-	PageWorkerGroup(context.Context, *PageWorkerGroupRequest) (*PageWorkerGroupReply, error)
+	AllWorkerGroup(context.Context, *emptypb.Empty) (*AllWorkerGroupReply, error)
 	AddWorkerGroup(context.Context, *AddWorkerGroupRequest) (*AddWorkerGroupReply, error)
 	UpdateWorkerGroup(context.Context, *UpdateWorkerGroupRequest) (*emptypb.Empty, error)
 	DeleteWorkerGroup(context.Context, *DeleteWorkerGroupRequest) (*emptypb.Empty, error)
@@ -259,12 +314,17 @@ type ServiceServer interface {
 	EnableWorker(context.Context, *EnableWorkerRequest) (*emptypb.Empty, error)
 	DisableWorker(context.Context, *DisableWorkerRequest) (*emptypb.Empty, error)
 	DeleteWorker(context.Context, *DeleteWorkerRequest) (*emptypb.Empty, error)
+	AllTaskGroup(context.Context, *emptypb.Empty) (*AllTaskGroupReply, error)
+	AddTaskGroup(context.Context, *AddTaskGroupRequest) (*AddTaskGroupReply, error)
+	UpdateTaskGroup(context.Context, *UpdateTaskGroupRequest) (*emptypb.Empty, error)
+	DeleteTaskGroup(context.Context, *DeleteTaskGroupRequest) (*emptypb.Empty, error)
 	PageTask(context.Context, *PageTaskRequest) (*PageTaskReply, error)
 	AddTask(context.Context, *AddTaskRequest) (*AddTaskReply, error)
 	UpdateTask(context.Context, *UpdateTaskRequest) (*emptypb.Empty, error)
 	EnableTask(context.Context, *EnableTaskRequest) (*emptypb.Empty, error)
 	DisableTask(context.Context, *DisableTaskRequest) (*emptypb.Empty, error)
 	DeleteTask(context.Context, *DeleteTaskRequest) (*emptypb.Empty, error)
+	ExecTask(context.Context, *ExecTaskRequest) (*emptypb.Empty, error)
 	CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error)
 	PageLog(context.Context, *PageLogRequest) (*PageLogReply, error)
 	GetLog(context.Context, *GetLogRequest) (*Log, error)
@@ -275,8 +335,8 @@ type ServiceServer interface {
 type UnimplementedServiceServer struct {
 }
 
-func (UnimplementedServiceServer) PageWorkerGroup(context.Context, *PageWorkerGroupRequest) (*PageWorkerGroupReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PageWorkerGroup not implemented")
+func (UnimplementedServiceServer) AllWorkerGroup(context.Context, *emptypb.Empty) (*AllWorkerGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AllWorkerGroup not implemented")
 }
 func (UnimplementedServiceServer) AddWorkerGroup(context.Context, *AddWorkerGroupRequest) (*AddWorkerGroupReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddWorkerGroup not implemented")
@@ -305,6 +365,18 @@ func (UnimplementedServiceServer) DisableWorker(context.Context, *DisableWorkerR
 func (UnimplementedServiceServer) DeleteWorker(context.Context, *DeleteWorkerRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorker not implemented")
 }
+func (UnimplementedServiceServer) AllTaskGroup(context.Context, *emptypb.Empty) (*AllTaskGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AllTaskGroup not implemented")
+}
+func (UnimplementedServiceServer) AddTaskGroup(context.Context, *AddTaskGroupRequest) (*AddTaskGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTaskGroup not implemented")
+}
+func (UnimplementedServiceServer) UpdateTaskGroup(context.Context, *UpdateTaskGroupRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTaskGroup not implemented")
+}
+func (UnimplementedServiceServer) DeleteTaskGroup(context.Context, *DeleteTaskGroupRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTaskGroup not implemented")
+}
 func (UnimplementedServiceServer) PageTask(context.Context, *PageTaskRequest) (*PageTaskReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PageTask not implemented")
 }
@@ -322,6 +394,9 @@ func (UnimplementedServiceServer) DisableTask(context.Context, *DisableTaskReque
 }
 func (UnimplementedServiceServer) DeleteTask(context.Context, *DeleteTaskRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTask not implemented")
+}
+func (UnimplementedServiceServer) ExecTask(context.Context, *ExecTaskRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExecTask not implemented")
 }
 func (UnimplementedServiceServer) CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelExecTask not implemented")
@@ -345,20 +420,20 @@ func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
 	s.RegisterService(&Service_ServiceDesc, srv)
 }
 
-func _Service_PageWorkerGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PageWorkerGroupRequest)
+func _Service_AllWorkerGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServiceServer).PageWorkerGroup(ctx, in)
+		return srv.(ServiceServer).AllWorkerGroup(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Service_PageWorkerGroup_FullMethodName,
+		FullMethod: Service_AllWorkerGroup_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).PageWorkerGroup(ctx, req.(*PageWorkerGroupRequest))
+		return srv.(ServiceServer).AllWorkerGroup(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -525,6 +600,78 @@ func _Service_DeleteWorker_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Service_AllTaskGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).AllTaskGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_AllTaskGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).AllTaskGroup(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_AddTaskGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddTaskGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).AddTaskGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_AddTaskGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).AddTaskGroup(ctx, req.(*AddTaskGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_UpdateTaskGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTaskGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).UpdateTaskGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_UpdateTaskGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).UpdateTaskGroup(ctx, req.(*UpdateTaskGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_DeleteTaskGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTaskGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).DeleteTaskGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_DeleteTaskGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).DeleteTaskGroup(ctx, req.(*DeleteTaskGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Service_PageTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PageTaskRequest)
 	if err := dec(in); err != nil {
@@ -633,6 +780,24 @@ func _Service_DeleteTask_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Service_ExecTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExecTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).ExecTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Service_ExecTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).ExecTask(ctx, req.(*ExecTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Service_CancelExecTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CancelExecTaskRequest)
 	if err := dec(in); err != nil {
@@ -695,8 +860,8 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PageWorkerGroup",
-			Handler:    _Service_PageWorkerGroup_Handler,
+			MethodName: "AllWorkerGroup",
+			Handler:    _Service_AllWorkerGroup_Handler,
 		},
 		{
 			MethodName: "AddWorkerGroup",
@@ -735,6 +900,22 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Service_DeleteWorker_Handler,
 		},
 		{
+			MethodName: "AllTaskGroup",
+			Handler:    _Service_AllTaskGroup_Handler,
+		},
+		{
+			MethodName: "AddTaskGroup",
+			Handler:    _Service_AddTaskGroup_Handler,
+		},
+		{
+			MethodName: "UpdateTaskGroup",
+			Handler:    _Service_UpdateTaskGroup_Handler,
+		},
+		{
+			MethodName: "DeleteTaskGroup",
+			Handler:    _Service_DeleteTaskGroup_Handler,
+		},
+		{
 			MethodName: "PageTask",
 			Handler:    _Service_PageTask_Handler,
 		},
@@ -757,6 +938,10 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTask",
 			Handler:    _Service_DeleteTask_Handler,
+		},
+		{
+			MethodName: "ExecTask",
+			Handler:    _Service_ExecTask_Handler,
 		},
 		{
 			MethodName: "CancelExecTask",

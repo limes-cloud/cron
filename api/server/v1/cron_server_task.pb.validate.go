@@ -35,6 +35,727 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on TaskGroup with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *TaskGroup) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskGroup with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TaskGroupMultiError, or nil
+// if none found.
+func (m *TaskGroup) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskGroup) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Name
+
+	// no validation rules for Description
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	if len(errors) > 0 {
+		return TaskGroupMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskGroupMultiError is an error wrapping multiple validation errors returned
+// by TaskGroup.ValidateAll() if the designated constraints aren't met.
+type TaskGroupMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskGroupMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskGroupMultiError) AllErrors() []error { return m }
+
+// TaskGroupValidationError is the validation error returned by
+// TaskGroup.Validate if the designated constraints aren't met.
+type TaskGroupValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskGroupValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskGroupValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskGroupValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskGroupValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskGroupValidationError) ErrorName() string { return "TaskGroupValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TaskGroupValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskGroup.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskGroupValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskGroupValidationError{}
+
+// Validate checks the field values on AllTaskGroupReply with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AllTaskGroupReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AllTaskGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AllTaskGroupReplyMultiError, or nil if none found.
+func (m *AllTaskGroupReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AllTaskGroupReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AllTaskGroupReplyValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AllTaskGroupReplyValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AllTaskGroupReplyValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return AllTaskGroupReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// AllTaskGroupReplyMultiError is an error wrapping multiple validation errors
+// returned by AllTaskGroupReply.ValidateAll() if the designated constraints
+// aren't met.
+type AllTaskGroupReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AllTaskGroupReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AllTaskGroupReplyMultiError) AllErrors() []error { return m }
+
+// AllTaskGroupReplyValidationError is the validation error returned by
+// AllTaskGroupReply.Validate if the designated constraints aren't met.
+type AllTaskGroupReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AllTaskGroupReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AllTaskGroupReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AllTaskGroupReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AllTaskGroupReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AllTaskGroupReplyValidationError) ErrorName() string {
+	return "AllTaskGroupReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AllTaskGroupReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAllTaskGroupReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AllTaskGroupReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AllTaskGroupReplyValidationError{}
+
+// Validate checks the field values on AddTaskGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddTaskGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddTaskGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddTaskGroupRequestMultiError, or nil if none found.
+func (m *AddTaskGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddTaskGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := AddTaskGroupRequestValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		err := AddTaskGroupRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AddTaskGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddTaskGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by AddTaskGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type AddTaskGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddTaskGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddTaskGroupRequestMultiError) AllErrors() []error { return m }
+
+// AddTaskGroupRequestValidationError is the validation error returned by
+// AddTaskGroupRequest.Validate if the designated constraints aren't met.
+type AddTaskGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddTaskGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddTaskGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddTaskGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddTaskGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddTaskGroupRequestValidationError) ErrorName() string {
+	return "AddTaskGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddTaskGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddTaskGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddTaskGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddTaskGroupRequestValidationError{}
+
+// Validate checks the field values on AddTaskGroupReply with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AddTaskGroupReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddTaskGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddTaskGroupReplyMultiError, or nil if none found.
+func (m *AddTaskGroupReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddTaskGroupReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return AddTaskGroupReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddTaskGroupReplyMultiError is an error wrapping multiple validation errors
+// returned by AddTaskGroupReply.ValidateAll() if the designated constraints
+// aren't met.
+type AddTaskGroupReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddTaskGroupReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddTaskGroupReplyMultiError) AllErrors() []error { return m }
+
+// AddTaskGroupReplyValidationError is the validation error returned by
+// AddTaskGroupReply.Validate if the designated constraints aren't met.
+type AddTaskGroupReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddTaskGroupReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddTaskGroupReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddTaskGroupReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddTaskGroupReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddTaskGroupReplyValidationError) ErrorName() string {
+	return "AddTaskGroupReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddTaskGroupReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddTaskGroupReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddTaskGroupReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddTaskGroupReplyValidationError{}
+
+// Validate checks the field values on UpdateTaskGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateTaskGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateTaskGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateTaskGroupRequestMultiError, or nil if none found.
+func (m *UpdateTaskGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateTaskGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := UpdateTaskGroupRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := UpdateTaskGroupRequestValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		err := UpdateTaskGroupRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return UpdateTaskGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateTaskGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by UpdateTaskGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateTaskGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateTaskGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateTaskGroupRequestMultiError) AllErrors() []error { return m }
+
+// UpdateTaskGroupRequestValidationError is the validation error returned by
+// UpdateTaskGroupRequest.Validate if the designated constraints aren't met.
+type UpdateTaskGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateTaskGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateTaskGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateTaskGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateTaskGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateTaskGroupRequestValidationError) ErrorName() string {
+	return "UpdateTaskGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateTaskGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateTaskGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateTaskGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateTaskGroupRequestValidationError{}
+
+// Validate checks the field values on DeleteTaskGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteTaskGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteTaskGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteTaskGroupRequestMultiError, or nil if none found.
+func (m *DeleteTaskGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteTaskGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := DeleteTaskGroupRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DeleteTaskGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteTaskGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by DeleteTaskGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteTaskGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteTaskGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteTaskGroupRequestMultiError) AllErrors() []error { return m }
+
+// DeleteTaskGroupRequestValidationError is the validation error returned by
+// DeleteTaskGroupRequest.Validate if the designated constraints aren't met.
+type DeleteTaskGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteTaskGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteTaskGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteTaskGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteTaskGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteTaskGroupRequestValidationError) ErrorName() string {
+	return "DeleteTaskGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteTaskGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteTaskGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteTaskGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteTaskGroupRequestValidationError{}
+
 // Validate checks the field values on Task with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.
@@ -83,6 +804,39 @@ func (m *Task) validate(all bool) error {
 	// no validation rules for Status
 
 	// no validation rules for Description
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	if all {
+		switch v := interface{}(m.GetGroup()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskValidationError{
+					field:  "Group",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskValidationError{
+					field:  "Group",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGroup()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskValidationError{
+				field:  "Group",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if m.WorkerGroupId != nil {
 		// no validation rules for WorkerGroupId
@@ -575,50 +1329,6 @@ func (m *AddTaskRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetExpectCode() < 0 {
-		err := AddTaskRequestValidationError{
-			field:  "ExpectCode",
-			reason: "value must be greater than or equal to 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetRetryCount() < 0 {
-		err := AddTaskRequestValidationError{
-			field:  "RetryCount",
-			reason: "value must be greater than or equal to 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetRetryWaitTime() < 0 {
-		err := AddTaskRequestValidationError{
-			field:  "RetryWaitTime",
-			reason: "value must be greater than or equal to 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetMaxExecTime() < 0 {
-		err := AddTaskRequestValidationError{
-			field:  "MaxExecTime",
-			reason: "value must be greater than or equal to 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	// no validation rules for Description
 
 	if m.WorkerGroupId != nil {
@@ -642,6 +1352,66 @@ func (m *AddTaskRequest) validate(all bool) error {
 			err := AddTaskRequestValidationError{
 				field:  "WorkerId",
 				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.ExpectCode != nil {
+
+		if m.GetExpectCode() < 0 {
+			err := AddTaskRequestValidationError{
+				field:  "ExpectCode",
+				reason: "value must be greater than or equal to 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.RetryCount != nil {
+
+		if m.GetRetryCount() < 0 {
+			err := AddTaskRequestValidationError{
+				field:  "RetryCount",
+				reason: "value must be greater than or equal to 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.RetryWaitTime != nil {
+
+		if m.GetRetryWaitTime() < 0 {
+			err := AddTaskRequestValidationError{
+				field:  "RetryWaitTime",
+				reason: "value must be greater than or equal to 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.MaxExecTime != nil {
+
+		if m.GetMaxExecTime() < 0 {
+			err := AddTaskRequestValidationError{
+				field:  "MaxExecTime",
+				reason: "value must be greater than or equal to 0",
 			}
 			if !all {
 				return err
@@ -1434,6 +2204,117 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteTaskRequestValidationError{}
+
+// Validate checks the field values on ExecTaskRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ExecTaskRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExecTaskRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExecTaskRequestMultiError, or nil if none found.
+func (m *ExecTaskRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExecTaskRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := ExecTaskRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ExecTaskRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ExecTaskRequestMultiError is an error wrapping multiple validation errors
+// returned by ExecTaskRequest.ValidateAll() if the designated constraints
+// aren't met.
+type ExecTaskRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExecTaskRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExecTaskRequestMultiError) AllErrors() []error { return m }
+
+// ExecTaskRequestValidationError is the validation error returned by
+// ExecTaskRequest.Validate if the designated constraints aren't met.
+type ExecTaskRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExecTaskRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExecTaskRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExecTaskRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExecTaskRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExecTaskRequestValidationError) ErrorName() string { return "ExecTaskRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ExecTaskRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExecTaskRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExecTaskRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExecTaskRequestValidationError{}
 
 // Validate checks the field values on CancelExecTaskRequest with the rules
 // defined in the proto definition for this message. If any rules are

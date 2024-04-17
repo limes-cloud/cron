@@ -1,6 +1,8 @@
 package data
 
 import (
+	"time"
+
 	"github.com/limes-cloud/kratosx"
 	"gorm.io/gorm"
 
@@ -26,21 +28,29 @@ func (t logRepo) GetLog(ctx kratosx.Context, id uint32) (*biz.Log, error) {
 func (t logRepo) PageLog(ctx kratosx.Context, req *biz.PageLogRequest) ([]*biz.Log, uint32, error) {
 	var list []*biz.Log
 	var total int64
-	db := ctx.DB().Model(biz.Log{}).Where("task_id=?", req.TaskId)
+	db := ctx.DB().Model(biz.Log{}).Select("id,uuid,start,end,status").Where("task_id=?", req.TaskId)
 
 	if err := db.Count(&total).Error; err != nil {
 		return nil, uint32(total), err
 	}
-	db = db.Offset(int((req.Page - 1) * req.PageSize)).Limit(int(req.PageSize))
+	db = db.Offset(int((req.Page - 1) * req.PageSize)).Order("id desc").Limit(int(req.PageSize))
 	return list, uint32(total), db.Find(&list).Error
 }
 
 func (t logRepo) AppendLogContent(ctx kratosx.Context, uuid string, c string) error {
-	return ctx.DB().Model(&biz.Log{}).Where("uuid=?", uuid).UpdateColumn("content", gorm.Expr("content+?", c)).Error
+	return ctx.DB().Model(&biz.Log{}).Where("uuid=?", uuid).UpdateColumn("content", gorm.Expr("CONCAT(content,?)", ","+c)).Error
 }
 
 func (t logRepo) UpdateLogStatus(ctx kratosx.Context, uuid string, err error) error {
-	return ctx.DB().Model(&biz.Log{}).Where("uuid=?", uuid).UpdateColumn("status", err == nil).Error
+	status := biz.ExecSuccess
+	if err != nil {
+		status = biz.ExecFail
+	}
+	log := &biz.Log{
+		Status: status,
+		End:    time.Now().Unix(),
+	}
+	return ctx.DB().Where("uuid=?", uuid).Updates(log).Error
 }
 
 func (t logRepo) TaskIsRunning(ctx kratosx.Context, uuid string) bool {

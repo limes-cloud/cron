@@ -21,11 +21,12 @@ func (s *store) tid(id uint32) string {
 }
 
 func (s *store) set(id uint32, spec string) {
-	s.rdb.HSet(context.Background(), key, s.tid(id), spec).Result()
+	s.rdb.HSet(context.Background(), key, s.tid(id), spec)
 }
 
 func (s *store) get(id uint32) string {
-	return s.rdb.HGet(context.Background(), key, s.tid(id)).String()
+	res, _ := s.rdb.HGet(context.Background(), key, s.tid(id)).Result()
+	return res
 }
 
 func (s *store) delete(id uint32) {

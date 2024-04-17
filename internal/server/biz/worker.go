@@ -14,47 +14,46 @@ type WorkerFactory interface {
 
 type WorkerRepo interface {
 	AddWorkerGroup(ctx kratosx.Context, in *WorkerGroup) (uint32, error)
-	PageWorkerGroup(ctx kratosx.Context, req *PageWorkerGroupRequest) ([]*WorkerGroup, uint32, error)
+	AllWorkerGroup(ctx kratosx.Context) ([]*WorkerGroup, error)
 	UpdateWorkerGroup(ctx kratosx.Context, c *WorkerGroup) error
 	DeleteWorkerGroup(ctx kratosx.Context, id uint32) error
 
 	GetWorkerByGroupId(ctx kratosx.Context, id uint32) (*Worker, error)
 	AddWorker(ctx kratosx.Context, in *Worker) (uint32, error)
 	GetWorker(ctx kratosx.Context, id uint32) (*Worker, error)
-	GetWorkersByTag(ctx kratosx.Context, tag string) ([]*Worker, error)
 	PageWorker(ctx kratosx.Context, req *PageWorkerRequest) ([]*Worker, uint32, error)
 	UpdateWorker(ctx kratosx.Context, c *Worker) error
 	DeleteWorker(ctx kratosx.Context, id uint32) error
+	EnableWorker(ctx kratosx.Context, id uint32) error
+	DisableWorker(ctx kratosx.Context, id uint32) error
 }
 
 type WorkerGroup struct {
 	ktypes.BaseModel
-	Name        string
+	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
 type Worker struct {
 	ktypes.BaseModel
-	Name        string `json:"name"`
-	IP          string `json:"ip"`
-	Tag         string `json:"tag"`
-	Status      string `json:"status"`
-	StopDesc    string `json:"stop_desc"`
-	Description string `json:"description"`
+	GroupId     *uint32      `json:"group_id"`
+	Name        string       `json:"name"`
+	IP          string       `json:"ip"`
+	Status      *bool        `json:"status"`
+	Description string       `json:"description"`
+	Group       *WorkerGroup `json:"group"`
 }
 
 type PageWorkerGroupRequest struct {
-	Page     uint32
-	PageSize uint32
+	Page     uint32 `json:"page"`
+	PageSize uint32 `json:"page_size"`
 }
 
 type PageWorkerRequest struct {
-	Page     uint32
-	PageSize uint32
-	Tag      *string
-	Status   *string
-	IP       *string
-	Name     *string
+	Page     uint32  `json:"page"`
+	PageSize uint32  `json:"page_size"`
+	Name     *string `json:"name"`
+	GroupId  *uint32 `json:"group_id"`
 }
 
 type WorkerUseCase struct {
@@ -64,8 +63,9 @@ type WorkerUseCase struct {
 }
 
 const (
-	WorkerEnabled  = "enabled"
-	WorkerDisabled = "disabled"
+	WorkerRunning  = "running"
+	WorkerEnabled  = true
+	WorkerDisabled = false
 )
 
 // NewWorkerUseCase 创建UseCase实体
@@ -73,16 +73,16 @@ func NewWorkerUseCase(config *conf.Config, repo WorkerRepo, factory WorkerFactor
 	return &WorkerUseCase{config: config, repo: repo, factory: factory}
 }
 
-// PageWorkerGroup 获取分页任务分组
-func (u *WorkerUseCase) PageWorkerGroup(ctx kratosx.Context, req *PageWorkerGroupRequest) ([]*WorkerGroup, uint32, error) {
-	tg, total, err := u.repo.PageWorkerGroup(ctx, req)
+// AllWorkerGroup 获取全部节点分组
+func (u *WorkerUseCase) AllWorkerGroup(ctx kratosx.Context) ([]*WorkerGroup, error) {
+	tg, err := u.repo.AllWorkerGroup(ctx)
 	if err != nil {
-		return nil, 0, errors.NotFound()
+		return nil, errors.NotFound()
 	}
-	return tg, total, nil
+	return tg, nil
 }
 
-// AddWorkerGroup 添加任务分组
+// AddWorkerGroup 添加节点分组
 func (u *WorkerUseCase) AddWorkerGroup(ctx kratosx.Context, tg *WorkerGroup) (uint32, error) {
 	id, err := u.repo.AddWorkerGroup(ctx, tg)
 	if err != nil {
@@ -91,7 +91,7 @@ func (u *WorkerUseCase) AddWorkerGroup(ctx kratosx.Context, tg *WorkerGroup) (ui
 	return id, nil
 }
 
-// UpdateWorkerGroup 删除指定任务分组
+// UpdateWorkerGroup 删除指定节点分组
 func (u *WorkerUseCase) UpdateWorkerGroup(ctx kratosx.Context, tg *WorkerGroup) error {
 	if err := u.repo.UpdateWorkerGroup(ctx, tg); err != nil {
 		return errors.DatabaseFormat(err.Error())
@@ -99,7 +99,7 @@ func (u *WorkerUseCase) UpdateWorkerGroup(ctx kratosx.Context, tg *WorkerGroup) 
 	return nil
 }
 
-// DeleteWorkerGroup 删除指定任务分组
+// DeleteWorkerGroup 删除指定节点分组
 func (u *WorkerUseCase) DeleteWorkerGroup(ctx kratosx.Context, id uint32) error {
 	if err := u.repo.DeleteWorkerGroup(ctx, id); err != nil {
 		return errors.DatabaseFormat(err.Error())
@@ -125,9 +125,13 @@ func (u *WorkerUseCase) AddWorker(ctx kratosx.Context, worker *Worker) (uint32, 
 	return id, nil
 }
 
-// UpdateWorker 删除指定工作节点
+// UpdateWorker 更新指定工作节点
 func (u *WorkerUseCase) UpdateWorker(ctx kratosx.Context, worker *Worker) error {
-	if worker.Status != WorkerDisabled {
+	old, err := u.repo.GetWorker(ctx, worker.ID)
+	if err != nil {
+		return errors.DatabaseFormat(err.Error())
+	}
+	if *old.Status != WorkerDisabled {
 		worker.IP = ""
 	}
 	if err := u.repo.UpdateWorker(ctx, worker); err != nil {
@@ -142,7 +146,7 @@ func (u *WorkerUseCase) DeleteWorker(ctx kratosx.Context, id uint32) error {
 	if err != nil {
 		return errors.DatabaseFormat(err.Error())
 	}
-	if worker.Status != WorkerDisabled {
+	if *worker.Status != WorkerDisabled {
 		return errors.DeleteNotDisabledWorker()
 	}
 	if err := u.repo.DeleteWorker(ctx, id); err != nil {
@@ -158,16 +162,16 @@ func (u *WorkerUseCase) EnableWorker(ctx kratosx.Context, id uint32) error {
 		return errors.DatabaseFormat(err.Error())
 	}
 
-	if worker.Status != WorkerDisabled {
+	if *worker.Status != WorkerDisabled {
 		return errors.EnableNotDisabledWorker()
 	}
 
 	if err := u.factory.CheckIP(ctx, worker.IP); err != nil {
-		return err
+		ctx.Logger().Errorw("check ip error", err.Error())
+		return errors.WorkerNotAvailable()
 	}
 
-	worker.Status = WorkerEnabled
-	if err := u.repo.UpdateWorker(ctx, worker); err != nil {
+	if err := u.repo.EnableWorker(ctx, worker.ID); err != nil {
 		return errors.DatabaseFormat(err.Error())
 	}
 	return nil
@@ -175,11 +179,7 @@ func (u *WorkerUseCase) EnableWorker(ctx kratosx.Context, id uint32) error {
 
 // DisableWorker 禁用指定工作节点
 func (u *WorkerUseCase) DisableWorker(ctx kratosx.Context, id uint32) error {
-	worker := Worker{
-		BaseModel: ktypes.BaseModel{ID: id},
-		Status:    WorkerDisabled,
-	}
-	if err := u.repo.UpdateWorker(ctx, &worker); err != nil {
+	if err := u.repo.DisableWorker(ctx, id); err != nil {
 		return errors.DatabaseFormat(err.Error())
 	}
 	return nil

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-redis/redis/v8"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/limes-cloud/kratosx"
 	"github.com/limes-cloud/kratosx/library/pool"
 
@@ -86,7 +87,7 @@ func (w *Factory) ping(ctx kratosx.Context, ip string) error {
 	if err != nil {
 		return err
 	}
-	_, err = v1.NewServiceClient(conn).Healthy(ctx, nil)
+	_, err = v1.NewServiceClient(conn).Healthy(ctx, &empty.Empty{})
 	return err
 }
 
@@ -109,12 +110,12 @@ func (w *Factory) CheckIP(ctx kratosx.Context, ip string) error {
 				break
 			default:
 				res, err := w.redis.BLPop(ctx, 1*time.Second, queuePrefix+ip).Result()
-				if err != nil || len(res) == 0 {
+				if err != nil || len(res) != 2 {
 					continue
 				}
 				ct++
-				if res[0] != allow {
-					ec <- errors.New(res[0])
+				if res[1] != allow {
+					ec <- errors.New(res[1])
 					break
 				}
 				if ct >= int(count) {

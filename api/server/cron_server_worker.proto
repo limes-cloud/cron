@@ -16,14 +16,8 @@ message WorkerGroup{
   uint32 updated_at = 5;
 }
 
-message PageWorkerGroupRequest{
-  uint32 page = 1[(validate.rules).uint32 = {gt:0}];
-  uint32 page_size = 2[(validate.rules).uint32 = {lte:100}];
-}
-
-message PageWorkerGroupReply{
-  uint32 total = 1;
-  repeated WorkerGroup list = 2;
+message AllWorkerGroupReply{
+  repeated WorkerGroup list = 1;
 }
 
 message AddWorkerGroupRequest{
@@ -49,21 +43,19 @@ message Worker{
   uint32 id = 1;
   string name = 2;
   string ip = 3;
-  string tag = 4;
-  string status = 5;
-  string stop_desc = 6;
-  string description = 7;
-  uint32 created_at = 8;
-  uint32 updated_at = 9;
+  optional uint32 group_id = 4;
+  bool status = 5;
+  string description = 6;
+  uint32 created_at = 7;
+  uint32 updated_at = 8;
+  optional WorkerGroup group = 9;
 }
 
 message PageWorkerRequest{
   uint32 page = 1[(validate.rules).uint32 = {gt:0}];
   uint32 page_size = 2[(validate.rules).uint32 = {lte:100}];
-  optional string tag = 3[(validate.rules).string = {min_len:1}];
-  optional string ip = 4[(validate.rules).string = {ip:true}];
-  optional string name = 5[(validate.rules).string = {min_len:1}];
-  optional bool status = 6;
+  optional uint32 group_id = 3;
+  optional string name = 5;
 }
 
 message PageWorkerReply{
@@ -74,7 +66,7 @@ message PageWorkerReply{
 message AddWorkerRequest{
   string name = 1[(validate.rules).string = {min_len:1}];
   string ip = 2[(validate.rules).string = {min_len:1}];
-  string tag = 3[(validate.rules).string = {min_len:1}];
+  optional uint32 group_id = 3[(validate.rules).uint32 = {gt:0}];
   string description = 4[(validate.rules).string = {min_len:1}];
 }
 
@@ -83,10 +75,11 @@ message AddWorkerReply{
 }
 
 message UpdateWorkerRequest{
-  string name = 1[(validate.rules).string = {min_len:1}];
-  string ip = 2[(validate.rules).string = {min_len:1}];
-  string tag = 3[(validate.rules).string = {min_len:1}];
-  string description = 4[(validate.rules).string = {min_len:1}];
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+  string name = 2[(validate.rules).string = {min_len:1}];
+  string ip = 3[(validate.rules).string = {min_len:1}];
+  optional uint32 group_id = 4[(validate.rules).uint32 = {gt:0}];
+  string description = 5[(validate.rules).string = {min_len:1}];
 }
 
 message EnableWorkerRequest{

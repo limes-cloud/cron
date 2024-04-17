@@ -144,153 +144,27 @@ var _ interface {
 	ErrorName() string
 } = WorkerGroupValidationError{}
 
-// Validate checks the field values on PageWorkerGroupRequest with the rules
+// Validate checks the field values on AllWorkerGroupReply with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *PageWorkerGroupRequest) Validate() error {
+func (m *AllWorkerGroupReply) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PageWorkerGroupRequest with the rules
+// ValidateAll checks the field values on AllWorkerGroupReply with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// PageWorkerGroupRequestMultiError, or nil if none found.
-func (m *PageWorkerGroupRequest) ValidateAll() error {
+// AllWorkerGroupReplyMultiError, or nil if none found.
+func (m *AllWorkerGroupReply) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PageWorkerGroupRequest) validate(all bool) error {
+func (m *AllWorkerGroupReply) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
-
-	if m.GetPage() <= 0 {
-		err := PageWorkerGroupRequestValidationError{
-			field:  "Page",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetPageSize() > 100 {
-		err := PageWorkerGroupRequestValidationError{
-			field:  "PageSize",
-			reason: "value must be less than or equal to 100",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return PageWorkerGroupRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// PageWorkerGroupRequestMultiError is an error wrapping multiple validation
-// errors returned by PageWorkerGroupRequest.ValidateAll() if the designated
-// constraints aren't met.
-type PageWorkerGroupRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m PageWorkerGroupRequestMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m PageWorkerGroupRequestMultiError) AllErrors() []error { return m }
-
-// PageWorkerGroupRequestValidationError is the validation error returned by
-// PageWorkerGroupRequest.Validate if the designated constraints aren't met.
-type PageWorkerGroupRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PageWorkerGroupRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PageWorkerGroupRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PageWorkerGroupRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PageWorkerGroupRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PageWorkerGroupRequestValidationError) ErrorName() string {
-	return "PageWorkerGroupRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e PageWorkerGroupRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPageWorkerGroupRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PageWorkerGroupRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PageWorkerGroupRequestValidationError{}
-
-// Validate checks the field values on PageWorkerGroupReply with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *PageWorkerGroupReply) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on PageWorkerGroupReply with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// PageWorkerGroupReplyMultiError, or nil if none found.
-func (m *PageWorkerGroupReply) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *PageWorkerGroupReply) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Total
 
 	for idx, item := range m.GetList() {
 		_, _ = idx, item
@@ -299,7 +173,7 @@ func (m *PageWorkerGroupReply) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, PageWorkerGroupReplyValidationError{
+					errors = append(errors, AllWorkerGroupReplyValidationError{
 						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -307,7 +181,7 @@ func (m *PageWorkerGroupReply) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, PageWorkerGroupReplyValidationError{
+					errors = append(errors, AllWorkerGroupReplyValidationError{
 						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -316,7 +190,7 @@ func (m *PageWorkerGroupReply) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return PageWorkerGroupReplyValidationError{
+				return AllWorkerGroupReplyValidationError{
 					field:  fmt.Sprintf("List[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -327,19 +201,19 @@ func (m *PageWorkerGroupReply) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return PageWorkerGroupReplyMultiError(errors)
+		return AllWorkerGroupReplyMultiError(errors)
 	}
 
 	return nil
 }
 
-// PageWorkerGroupReplyMultiError is an error wrapping multiple validation
-// errors returned by PageWorkerGroupReply.ValidateAll() if the designated
+// AllWorkerGroupReplyMultiError is an error wrapping multiple validation
+// errors returned by AllWorkerGroupReply.ValidateAll() if the designated
 // constraints aren't met.
-type PageWorkerGroupReplyMultiError []error
+type AllWorkerGroupReplyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PageWorkerGroupReplyMultiError) Error() string {
+func (m AllWorkerGroupReplyMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -348,11 +222,11 @@ func (m PageWorkerGroupReplyMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PageWorkerGroupReplyMultiError) AllErrors() []error { return m }
+func (m AllWorkerGroupReplyMultiError) AllErrors() []error { return m }
 
-// PageWorkerGroupReplyValidationError is the validation error returned by
-// PageWorkerGroupReply.Validate if the designated constraints aren't met.
-type PageWorkerGroupReplyValidationError struct {
+// AllWorkerGroupReplyValidationError is the validation error returned by
+// AllWorkerGroupReply.Validate if the designated constraints aren't met.
+type AllWorkerGroupReplyValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -360,24 +234,24 @@ type PageWorkerGroupReplyValidationError struct {
 }
 
 // Field function returns field value.
-func (e PageWorkerGroupReplyValidationError) Field() string { return e.field }
+func (e AllWorkerGroupReplyValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PageWorkerGroupReplyValidationError) Reason() string { return e.reason }
+func (e AllWorkerGroupReplyValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PageWorkerGroupReplyValidationError) Cause() error { return e.cause }
+func (e AllWorkerGroupReplyValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PageWorkerGroupReplyValidationError) Key() bool { return e.key }
+func (e AllWorkerGroupReplyValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PageWorkerGroupReplyValidationError) ErrorName() string {
-	return "PageWorkerGroupReplyValidationError"
+func (e AllWorkerGroupReplyValidationError) ErrorName() string {
+	return "AllWorkerGroupReplyValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PageWorkerGroupReplyValidationError) Error() string {
+func (e AllWorkerGroupReplyValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -389,14 +263,14 @@ func (e PageWorkerGroupReplyValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPageWorkerGroupReply.%s: %s%s",
+		"invalid %sAllWorkerGroupReply.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PageWorkerGroupReplyValidationError{}
+var _ error = AllWorkerGroupReplyValidationError{}
 
 var _ interface {
 	Field() string
@@ -404,7 +278,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PageWorkerGroupReplyValidationError{}
+} = AllWorkerGroupReplyValidationError{}
 
 // Validate checks the field values on AddWorkerGroupRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -909,17 +783,50 @@ func (m *Worker) validate(all bool) error {
 
 	// no validation rules for Ip
 
-	// no validation rules for Tag
-
 	// no validation rules for Status
-
-	// no validation rules for StopDesc
 
 	// no validation rules for Description
 
 	// no validation rules for CreatedAt
 
 	// no validation rules for UpdatedAt
+
+	if m.GroupId != nil {
+		// no validation rules for GroupId
+	}
+
+	if m.Group != nil {
+
+		if all {
+			switch v := interface{}(m.GetGroup()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WorkerValidationError{
+						field:  "Group",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WorkerValidationError{
+						field:  "Group",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetGroup()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WorkerValidationError{
+					field:  "Group",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return WorkerMultiError(errors)
@@ -1042,53 +949,12 @@ func (m *PageWorkerRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.Tag != nil {
-
-		if utf8.RuneCountInString(m.GetTag()) < 1 {
-			err := PageWorkerRequestValidationError{
-				field:  "Tag",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	if m.Ip != nil {
-
-		if ip := net.ParseIP(m.GetIp()); ip == nil {
-			err := PageWorkerRequestValidationError{
-				field:  "Ip",
-				reason: "value must be a valid IP address",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+	if m.GroupId != nil {
+		// no validation rules for GroupId
 	}
 
 	if m.Name != nil {
-
-		if utf8.RuneCountInString(m.GetName()) < 1 {
-			err := PageWorkerRequestValidationError{
-				field:  "Name",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	if m.Status != nil {
-		// no validation rules for Status
+		// no validation rules for Name
 	}
 
 	if len(errors) > 0 {
@@ -1351,17 +1217,6 @@ func (m *AddWorkerRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetTag()) < 1 {
-		err := AddWorkerRequestValidationError{
-			field:  "Tag",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if utf8.RuneCountInString(m.GetDescription()) < 1 {
 		err := AddWorkerRequestValidationError{
 			field:  "Description",
@@ -1371,6 +1226,21 @@ func (m *AddWorkerRequest) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
+	}
+
+	if m.GroupId != nil {
+
+		if m.GetGroupId() <= 0 {
+			err := AddWorkerRequestValidationError{
+				field:  "GroupId",
+				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
 	}
 
 	if len(errors) > 0 {
@@ -1575,6 +1445,17 @@ func (m *UpdateWorkerRequest) validate(all bool) error {
 
 	var errors []error
 
+	if m.GetId() <= 0 {
+		err := UpdateWorkerRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if utf8.RuneCountInString(m.GetName()) < 1 {
 		err := UpdateWorkerRequestValidationError{
 			field:  "Name",
@@ -1597,17 +1478,6 @@ func (m *UpdateWorkerRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetTag()) < 1 {
-		err := UpdateWorkerRequestValidationError{
-			field:  "Tag",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if utf8.RuneCountInString(m.GetDescription()) < 1 {
 		err := UpdateWorkerRequestValidationError{
 			field:  "Description",
@@ -1617,6 +1487,21 @@ func (m *UpdateWorkerRequest) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
+	}
+
+	if m.GroupId != nil {
+
+		if m.GetGroupId() <= 0 {
+			err := UpdateWorkerRequestValidationError{
+				field:  "GroupId",
+				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
 	}
 
 	if len(errors) > 0 {

@@ -6,6 +6,37 @@ option go_package = "./v1;v1";
 import "validate/validate.proto";
 import "google/protobuf/struct.proto";
 
+message TaskGroup{
+  uint32 id = 1;
+  string name = 2;
+  string description = 3;
+  uint32 created_at = 4;
+  uint32 updated_at = 5;
+}
+
+message AllTaskGroupReply{
+  repeated TaskGroup list = 1;
+}
+
+message AddTaskGroupRequest{
+  string name = 1[(validate.rules).string = {min_len:1}];
+  string description = 2[(validate.rules).string = {min_len:1}];
+}
+
+message AddTaskGroupReply{
+  uint32 id = 1;
+}
+
+message UpdateTaskGroupRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+  string name = 2[(validate.rules).string = {min_len:1}];
+  string description = 3[(validate.rules).string = {min_len:1}];
+}
+
+message DeleteTaskGroupRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
 message Task{
   uint32 id = 1;
   uint32 group_id =2;
@@ -21,8 +52,11 @@ message Task{
   uint32  retry_count = 12;
   uint32  retry_wait_time = 13;
   uint32  max_exec_time = 14;
-  string  status = 15;
+  bool  status = 15;
   string  description = 16;
+  uint32  created_at = 17;
+  uint32  updated_at = 18;
+  TaskGroup group = 19;
 }
 
 message PageTaskRequest{
@@ -49,10 +83,10 @@ message AddTaskRequest{
   optional uint32 worker_id = 7[(validate.rules).uint32 = {gt:0}];
   string  exec_type = 8[(validate.rules).string = {min_len:1}];
   string  exec_value = 9[(validate.rules).string = {min_len:1}];
-  uint32  expect_code = 10[(validate.rules).uint32 = {gte:0}];
-  uint32  retry_count = 11[(validate.rules).uint32 = {gte:0}];
-  uint32  retry_wait_time = 12[(validate.rules).uint32 = {gte:0}];
-  uint32  max_exec_time = 13[(validate.rules).uint32 = {gte:0}];
+  optional uint32  expect_code = 10[(validate.rules).uint32 = {gte:0}];
+  optional uint32  retry_count = 11[(validate.rules).uint32 = {gte:0}];
+  optional uint32  retry_wait_time = 12[(validate.rules).uint32 = {gte:0}];
+  optional uint32  max_exec_time = 13[(validate.rules).uint32 = {gte:0}];
   string  description = 14;
 }
 
@@ -87,6 +121,10 @@ message DisableTaskRequest{
 }
 
 message DeleteTaskRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
+message ExecTaskRequest{
   uint32 id = 1[(validate.rules).uint32 = {gt:0}];
 }
 

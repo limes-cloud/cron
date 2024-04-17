@@ -25,9 +25,13 @@ func New(conf *conf.Config) *Service {
 	}
 }
 
+func (s *Service) Healthy(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, nil
+}
+
 func (s *Service) CancelExecTask(_ context.Context, req *v1.CancelExecTaskRequest) (*emptypb.Empty, error) {
 	s.task.CancelExecTask(req.Uuid)
-	return nil, nil
+	return &emptypb.Empty{}, nil
 }
 
 func (s *Service) ExecTask(req *v1.ExecTaskRequest, res v1.Service_ExecTaskServer) error {

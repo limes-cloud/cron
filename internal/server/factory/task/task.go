@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -16,6 +17,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/limes-cloud/kratosx"
+	"github.com/limes-cloud/kratosx/pkg/util"
 
 	clientV1 "github.com/limes-cloud/cron/api/client/v1"
 	apierrors "github.com/limes-cloud/cron/api/errors"
@@ -24,6 +26,7 @@ import (
 )
 
 const (
+	repairSleep = 180
 	maxWaitTime = 10
 
 	taskLockPrefix   = "cron:task:lock:"
@@ -53,6 +56,12 @@ type Factory struct {
 	cron   *cron.Cron
 	log    *log.Helper
 	ctx    kratosx.Context
+	wg     sync.WaitGroup
+	closer atomic.Bool
+}
+
+func GlobalFactory() *Factory {
+	return _f
 }
 
 func New(repo Repo) *Factory {
@@ -68,8 +77,10 @@ func New(repo Repo) *Factory {
 				cron.WithLocation(location),
 				cron.WithLogger(ctx.Logger()),
 			),
-			ctx: ctx,
-			log: ctx.Logger(),
+			ctx:   ctx,
+			log:   ctx.Logger(),
+			wg:    sync.WaitGroup{},
+			store: &store{rdb: ctx.Redis()},
 		}
 		_f.start()
 	})
@@ -83,8 +94,7 @@ type message struct {
 }
 
 func (t *Factory) DrySpec(s string) bool {
-	// TODO implement me
-	panic("implement me")
+	return t.cron.ValidateSpec(s) == nil
 }
 
 func (t *Factory) AddCron(id uint32, spec string) error {
@@ -95,6 +105,11 @@ func (t *Factory) AddCron(id uint32, spec string) error {
 		return err
 	}
 	return t.publish(t.ctx, &message{ID: id, Spec: spec, Type: add})
+}
+
+func (t *Factory) Close() {
+	t.closer.Store(true)
+	t.wg.Wait()
 }
 
 func (t *Factory) RemoveCron(id uint32) error {
@@ -182,6 +197,10 @@ func (t *Factory) exec(msg *message) {
 
 func (t *Factory) lockScheduler(id uint32, spec string) func() {
 	return func() {
+		if !t.closer.Load() {
+			return
+		}
+
 		expire := 2 * time.Second
 		if strings.Contains(spec, "0/") {
 			entry := t.cron.Entry(id)
@@ -190,20 +209,32 @@ func (t *Factory) lockScheduler(id uint32, spec string) func() {
 
 		key := fmt.Sprintf("%s%d", taskLockPrefix, id)
 		if is, _ := t.rdb.SetNX(context.Background(), key, 1, expire).Result(); is {
+			t.wg.Add(1)
+			defer t.wg.Done()
 			if err := t.scheduler(id); err != nil {
 				t.log.Errorw("exec task error", err.Error())
-				// todo 故障转移
 				return
 			}
 		}
 	}
 }
 
+func (t *Factory) Scheduler(id uint32) error {
+	return t.scheduler(id)
+}
+
+func (t *Factory) genUid() string {
+	return util.MD5ToUpper([]byte(uuid.NewString()))
+}
+
 func (t *Factory) scheduler(id uint32) error {
-	t.log.Infof("开始进行调度任务：%d", id)
+	t.log.Infof("start scheduler task：%d", id)
 	tk, err := t.repo.GetTask(t.ctx, id)
 	if err != nil {
 		return err
+	}
+	if tk.Status == biz.TaskDisabled {
+		return errors.New("task is disabled")
 	}
 
 	var (
@@ -218,7 +249,7 @@ func (t *Factory) scheduler(id uint32) error {
 		return err
 	}
 
-	uid := uuid.NewString()
+	uid := t.genUid()
 	if _, err := t.repo.AddLog(t.ctx, t.makeLog(uid, tk, wk)); err != nil {
 		return err
 	}
@@ -235,10 +266,10 @@ func (t *Factory) scheduler(id uint32) error {
 		Id:            tk.ID,
 		Type:          tk.ExecType,
 		Value:         tk.ExecValue,
-		ExpectCode:    tk.ExpectCode,
-		RetryCount:    tk.RetryCount,
-		RetryWaitTime: tk.RetryWaitTime,
-		MaxExecTime:   tk.MaxExecTime,
+		ExpectCode:    *tk.ExpectCode,
+		RetryCount:    *tk.RetryCount,
+		RetryWaitTime: *tk.RetryWaitTime,
+		MaxExecTime:   *tk.MaxExecTime,
 		Uuid:          uid,
 	}
 	stream, err := client.ExecTask(ctx, req)
@@ -246,12 +277,16 @@ func (t *Factory) scheduler(id uint32) error {
 		return err
 	}
 
+	var (
+		rer error
+		msg *clientV1.ExecTaskReply
+	)
 	for {
-		msg, err := stream.Recv()
-		if err != nil {
-			if err == io.EOF || apierrors.IsExecTaskFail(err) {
-				if err == io.EOF {
-					err = nil
+		msg, rer = stream.Recv()
+		if rer != nil {
+			if rer == io.EOF || apierrors.IsExecTaskFail(rer) {
+				if rer == io.EOF {
+					rer = nil
 				}
 				break
 			}
@@ -270,22 +305,28 @@ func (t *Factory) scheduler(id uint32) error {
 			t.log.Errorw("append log error", err.Error())
 		}
 	}
-	if err := t.repo.UpdateLogStatus(t.ctx, uid, err); err != nil {
+	if err := t.repo.UpdateLogStatus(t.ctx, uid, rer); err != nil {
 		t.log.Errorw("update log status error", err.Error())
 	}
-	return err
+	return rer
 }
 
 func (t *Factory) makeLog(uuid string, task *biz.Task, worker *biz.Worker) *biz.Log {
 	tb, _ := json.Marshal(task)
 	wb, _ := json.Marshal(worker)
-
+	start := clientV1.ExecTaskReply{
+		Type:    "info",
+		Content: "start scheduler",
+		Time:    uint32(time.Now().Unix()),
+	}
+	b, _ := json.Marshal(start)
 	return &biz.Log{
 		Uuid:           uuid,
 		TaskId:         task.ID,
 		TaskSnapshot:   string(tb),
 		WorkerId:       worker.ID,
 		WorkerSnapshot: string(wb),
+		Content:        string(b),
 		Start:          time.Now().Unix(),
 		Status:         biz.ExecRunning,
 	}
@@ -296,7 +337,7 @@ func (t *Factory) startRepair() {
 		ctx := kratosx.MustContext(context.Background())
 		for {
 			t.repair(ctx)
-			time.Sleep(10 * time.Second)
+			time.Sleep(repairSleep * time.Second)
 		}
 	}()
 }
