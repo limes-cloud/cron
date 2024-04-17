@@ -34,7 +34,7 @@ CREATE TABLE `log` (
   `status` char(32) NOT NULL COMMENT '执行结果',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid` (`uuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='日志信息';
+) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4  COMMENT='日志信息';
 
 -- ----------------------------
 -- Table structure for task
@@ -70,7 +70,7 @@ CREATE TABLE `task` (
   CONSTRAINT `task_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `task_group` (`id`),
   CONSTRAINT `task_ibfk_2` FOREIGN KEY (`worker_group_id`) REFERENCES `worker_group` (`id`),
   CONSTRAINT `task_ibfk_3` FOREIGN KEY (`worker_id`) REFERENCES `worker` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='任务信息';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4  COMMENT='任务信息';
 
 -- ----------------------------
 -- Table structure for task_group
@@ -86,7 +86,7 @@ CREATE TABLE `task_group` (
   UNIQUE KEY `name` (`name`),
   KEY `idx_task_group_updated_at` (`updated_at`),
   KEY `idx_task_group_created_at` (`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='任务分组';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4  COMMENT='任务分组';
 
 -- ----------------------------
 -- Table structure for worker
@@ -107,7 +107,7 @@ CREATE TABLE `worker` (
   KEY `idx_worker_created_at` (`created_at`),
   KEY `group_id` (`group_id`),
   CONSTRAINT `worker_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `worker_group` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='节点信息';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4  COMMENT='节点信息';
 
 -- ----------------------------
 -- Table structure for worker_group
@@ -123,6 +123,6 @@ CREATE TABLE `worker_group` (
   UNIQUE KEY `name` (`name`),
   KEY `idx_worker_group_updated_at` (`updated_at`),
   KEY `idx_worker_group_created_at` (`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='节点分组';
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4  COMMENT='节点分组';
 
 SET FOREIGN_KEY_CHECKS = 1;
