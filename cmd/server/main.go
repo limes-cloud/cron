@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	configure "github.com/limes-cloud/configure/client"
 	"github.com/limes-cloud/kratosx"
 	"github.com/limes-cloud/kratosx/config"
 	_ "go.uber.org/automaxprocs"
@@ -20,7 +20,7 @@ import (
 
 func main() {
 	app := kratosx.New(
-		kratosx.Config(file.NewSource("internal/server/conf/config.yaml")),
+		kratosx.Config(configure.NewFromEnv()),
 		kratosx.RegistrarServer(RegisterServer),
 		kratosx.Options(kratos.BeforeStop(func(ctx context.Context) error {
 			task.GlobalFactory().Close()
