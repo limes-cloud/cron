@@ -8,7 +8,7 @@ ADD go.sum .
 RUN go mod download
 WORKDIR /go/build
 ADD . .
-RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix cgo -o corn cmd/server/main.go
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix cgo -o cron cmd/server/main.go
 
 # 构建执行镜像
 FROM alpine
