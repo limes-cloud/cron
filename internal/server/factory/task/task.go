@@ -197,7 +197,7 @@ func (t *Factory) exec(msg *message) {
 
 func (t *Factory) lockScheduler(id uint32, spec string) func() {
 	return func() {
-		if !t.closer.Load() {
+		if t.closer.Load() {
 			return
 		}
 
