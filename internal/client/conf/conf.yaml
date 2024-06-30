@@ -18,4 +18,4 @@ log:
     maxAge: 1 #保留就文件的最大天数,单位天
     compress: false #是否进行压缩归档
 business:
-  shell: "/bin/bash"
+  shell: "/bin/sh"
