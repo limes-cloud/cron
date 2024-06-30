@@ -30,7 +30,7 @@ jobs:  # workflow中的job
         uses: docker/build-push-action@v2 # docker build & push
         with:
           push: true
-          dockerfile: ServerDockerfile
+          file: ServerDockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   push_client_to_registry: # job的名字
@@ -58,6 +58,6 @@ jobs:  # workflow中的job
         uses: docker/build-push-action@v2 # docker build & push
         with:
           push: true
-          dockerfile: ClientDockerfile
+          file: ClientDockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
