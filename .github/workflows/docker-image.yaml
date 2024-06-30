@@ -29,8 +29,8 @@ jobs:  # workflow中的job
       - name: Build and push Docker image
         uses: docker/build-push-action@v2 # docker build & push
         with:
-          context: .
           push: true
+          dockerfile: ServerDockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   push_client_to_registry: # job的名字
