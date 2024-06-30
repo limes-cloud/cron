@@ -6,14 +6,14 @@ import (
 	"github.com/limes-cloud/kratosx"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	v1 "github.com/limes-cloud/cron/api/client/v1"
+	v1 "github.com/limes-cloud/cron/api/cron/client/v1"
 	"github.com/limes-cloud/cron/internal/client/biz"
 	"github.com/limes-cloud/cron/internal/client/conf"
 	"github.com/limes-cloud/cron/internal/client/factory"
 )
 
 type Service struct {
-	v1.UnimplementedServiceServer
+	v1.UnimplementedClientServer
 	conf *conf.Config
 	task *biz.TaskUseCase
 }
@@ -34,7 +34,7 @@ func (s *Service) CancelExecTask(_ context.Context, req *v1.CancelExecTaskReques
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Service) ExecTask(req *v1.ExecTaskRequest, res v1.Service_ExecTaskServer) error {
+func (s *Service) ExecTask(req *v1.ExecTaskRequest, res v1.Client_ExecTaskServer) error {
 	task := &biz.Task{
 		Id:            req.Id,
 		Type:          req.Type,

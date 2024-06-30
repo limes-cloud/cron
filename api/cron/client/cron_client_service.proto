@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package cron.api.cron.client.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.client.v1";
+option java_outer_classname = "ClientV1";
+
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "api/cron/client/cron_client_task.proto";
+
+// 应用服务服务接口定义，渠道主要是配置用户登录时的可选登录方法
+service Client{
+  rpc Healthy(google.protobuf.Empty) returns(google.protobuf.Empty);
+  rpc ExecTask(ExecTaskRequest) returns(stream ExecTaskReply);
+  rpc CancelExecTask(CancelExecTaskRequest) returns(google.protobuf.Empty);
+}

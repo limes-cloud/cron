@@ -3,7 +3,7 @@ package biz
 import (
 	"github.com/limes-cloud/kratosx"
 
-	"github.com/limes-cloud/cron/api/errors"
+	"github.com/limes-cloud/cron/api/cron/errors"
 	"github.com/limes-cloud/cron/internal/client/conf"
 )
 
@@ -42,7 +42,7 @@ func NewTaskUseCase(config *conf.Config, factory TaskFactory) *TaskUseCase {
 
 func (uc *TaskUseCase) ExecTask(ctx kratosx.Context, task *Task, fn ExecTaskReplyFunc) error {
 	if err := uc.factory.ExecTask(ctx, task, fn); err != nil {
-		return errors.ExecTaskFailFormat(err.Error())
+		return errors.ExecTaskFailError(err.Error())
 	}
 	return nil
 }

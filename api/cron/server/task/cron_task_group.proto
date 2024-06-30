@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package cron.api.server.cron.task.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.task.v1";
+option java_outer_classname = "TaskV1";
+
+import "validate/validate.proto";
+
+message GetTaskGroupRequest {
+  optional uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+}
+
+message GetTaskGroupReply {
+  uint32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  uint32 createdAt = 4;
+  uint32 updatedAt = 5;
+}
+
+message ListTaskGroupRequest {
+  uint32 page = 1[(validate.rules).uint32 = {gt: 0}];
+  uint32 pageSize = 2[(validate.rules).uint32 = {gt: 0,lte:50}];
+  optional string order = 3[(validate.rules).string = {in: ["asc","desc"]}];
+  optional string orderBy = 4[(validate.rules).string = {in: ["id","created_at","updated_at"]}];
+  optional string name = 5;
+}
+
+message ListTaskGroupReply {
+  message TaskGroup {
+    uint32 id = 1;
+    string name = 2;
+    optional string description = 3;
+    uint32 createdAt = 4;
+    uint32 updatedAt = 5;
+  }
+
+  uint32 total = 1;
+  repeated TaskGroup list = 2;
+}
+
+message CreateTaskGroupRequest {
+  string name = 1[(validate.rules).string = {min_len: 1}];
+  optional string description = 2;
+}
+
+message CreateTaskGroupReply {
+  uint32 id = 1;
+}
+
+message UpdateTaskGroupRequest {
+  uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+  string name = 2[(validate.rules).string = {min_len: 1}];
+  optional string description = 3;
+}
+
+message UpdateTaskGroupReply {
+}
+
+message DeleteTaskGroupRequest {
+  uint32 id = 1[(validate.rules).uint32 = {gte:0}];
+}
+
+message DeleteTaskGroupReply {
+}
+

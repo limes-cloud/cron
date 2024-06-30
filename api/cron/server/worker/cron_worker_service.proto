@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package cron.api.server.cron.worker.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.worker.v1";
+option java_outer_classname = "WorkerV1";
+
+import "api/cron/server/worker/cron_worker_group.proto";
+import "google/api/annotations.proto";
+import "api/cron/server/worker/cron_worker.proto";
+
+service Worker{
+
+  // GetWorkerGroup 获取指定的节点分组
+  rpc GetWorkerGroup (GetWorkerGroupRequest) returns (GetWorkerGroupReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/worker_group",
+    };
+  }
+
+  // ListWorkerGroup 获取节点分组列表
+  rpc ListWorkerGroup (ListWorkerGroupRequest) returns (ListWorkerGroupReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/worker_groups",
+    };
+  }
+
+  // CreateWorkerGroup 创建节点分组
+  rpc CreateWorkerGroup (CreateWorkerGroupRequest) returns (CreateWorkerGroupReply) {
+    option (google.api.http) = {
+      post: "/cron/api/v1/worker_group",
+      body: "*"
+    };
+  }
+
+  // UpdateWorkerGroup 更新节点分组
+  rpc UpdateWorkerGroup (UpdateWorkerGroupRequest) returns (UpdateWorkerGroupReply) {
+    option (google.api.http) = {
+      put: "/cron/api/v1/worker_group",
+      body: "*"
+    };
+  }
+
+  // DeleteWorkerGroup 删除节点分组
+  rpc DeleteWorkerGroup (DeleteWorkerGroupRequest) returns (DeleteWorkerGroupReply) {
+    option (google.api.http) = {
+      delete: "/cron/api/v1/worker_group",
+    };
+  }
+
+  // GetWorker 获取指定的节点信息
+  rpc GetWorker (GetWorkerRequest) returns (GetWorkerReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/worker",
+    };
+  }
+
+  // ListWorker 获取节点信息列表
+  rpc ListWorker (ListWorkerRequest) returns (ListWorkerReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/workers",
+    };
+  }
+
+  // CreateWorker 创建节点信息
+  rpc CreateWorker (CreateWorkerRequest) returns (CreateWorkerReply) {
+    option (google.api.http) = {
+      post: "/cron/api/v1/worker",
+      body: "*"
+    };
+  }
+
+  // UpdateWorker 更新节点信息
+  rpc UpdateWorker (UpdateWorkerRequest) returns (UpdateWorkerReply) {
+    option (google.api.http) = {
+      put: "/cron/api/v1/worker",
+      body: "*"
+    };
+  }
+
+  // UpdateWorkerStatus 更新节点信息状态
+  rpc UpdateWorkerStatus (UpdateWorkerStatusRequest) returns (UpdateWorkerStatusReply) {
+    option (google.api.http) = {
+      put: "/cron/api/v1/worker/status",
+      body: "*"
+    };
+  }
+
+  // DeleteWorker 删除节点信息
+  rpc DeleteWorker (DeleteWorkerRequest) returns (DeleteWorkerReply) {
+    option (google.api.http) = {
+      delete: "/cron/api/v1/worker",
+    };
+  }
+
+}

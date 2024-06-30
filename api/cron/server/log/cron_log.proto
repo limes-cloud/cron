@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package cron.api.server.cron.log.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.log.v1";
+option java_outer_classname = "LogV1";
+
+import "validate/validate.proto";
+
+message GetLogRequest {
+  optional uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+}
+
+message GetLogReply {
+  uint32 id = 1;
+  string uuid = 2;
+  uint32 workerId = 3;
+  string workerSnapshot = 4;
+  uint32 taskId = 5;
+  string taskSnapshot = 6;
+  uint32 startAt = 7;
+  uint32 endAt = 8;
+  string content = 9;
+  string status = 10;
+}
+
+message ListLogRequest {
+  uint32 page = 1[(validate.rules).uint32 = {gt: 0}];
+  uint32 pageSize = 2[(validate.rules).uint32 = {gt: 0,lte:50}];
+  uint32 taskId = 3[(validate.rules).uint32 = {gt: 0}];
+  optional string order = 4[(validate.rules).string = {in: ["asc","desc"]}];
+  optional string orderBy = 5[(validate.rules).string = {in: ["id","created_at","updated_at"]}];
+}
+
+message ListLogReply {
+  message Log {
+    uint32 id = 1;
+    string uuid = 2;
+    uint32 workerId = 3;
+    uint32 taskId = 4;
+    uint32 startAt = 5;
+    uint32 endAt = 6;
+    string status = 7;
+  }
+
+  uint32 total = 1;
+  repeated Log list = 2;
+}
+
+message CreateLogRequest {
+  string uuid = 1[(validate.rules).string = {min_len: 1}];
+  uint32 workerId = 2[(validate.rules).uint32 = {gt: 0}];
+  string workerSnapshot = 3[(validate.rules).string = {min_len: 1}];
+  uint32 taskId = 4[(validate.rules).uint32 = {gt: 0}];
+  string taskSnapshot = 5[(validate.rules).string = {min_len: 1}];
+  uint32 startAt = 6;
+  uint32 endAt = 7;
+  string content = 8[(validate.rules).string = {min_len: 1}];
+  string status = 9[(validate.rules).string = {min_len: 1}];
+}
+
+message CreateLogReply {
+  uint32 id = 1;
+}
+
+message UpdateLogRequest {
+  uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+  string uuid = 2[(validate.rules).string = {min_len: 1}];
+  uint32 workerId = 3[(validate.rules).uint32 = {gt: 0}];
+  string workerSnapshot = 4[(validate.rules).string = {min_len: 1}];
+  uint32 taskId = 5[(validate.rules).uint32 = {gt: 0}];
+  string taskSnapshot = 6[(validate.rules).string = {min_len: 1}];
+  uint32 startAt = 7;
+  uint32 endAt = 8;
+  string content = 9[(validate.rules).string = {min_len: 1}];
+  string status = 10[(validate.rules).string = {min_len: 1}];
+}
+
+message UpdateLogReply {
+}
+
+message DeleteLogRequest {
+  repeated uint32 ids = 1[(validate.rules).repeated = {min_items: 1, unique:true, max_items:50}];
+}
+
+message DeleteLogReply {
+  uint32 total = 1;
+}
+

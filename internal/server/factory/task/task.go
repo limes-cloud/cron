@@ -6,28 +6,30 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
+	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/limes-cloud/kratosx"
-	"github.com/limes-cloud/kratosx/pkg/util"
+	"github.com/limes-cloud/kratosx/pkg/crypto"
 
-	clientV1 "github.com/limes-cloud/cron/api/client/v1"
-	apierrors "github.com/limes-cloud/cron/api/errors"
-	"github.com/limes-cloud/cron/internal/server/biz"
+	clientV1 "github.com/limes-cloud/cron/api/cron/client/v1"
+	apierrors "github.com/limes-cloud/cron/api/cron/errors"
+	"github.com/limes-cloud/cron/internal/server/biz/log"
+	"github.com/limes-cloud/cron/internal/server/biz/task"
+	"github.com/limes-cloud/cron/internal/server/biz/worker"
 	"github.com/limes-cloud/cron/internal/server/pkg/cron"
 )
 
 const (
-	repairSleep = 180
-	maxWaitTime = 10
+	repairSleep   = 180
+	maxWaitTime   = 600
+	maxRetryCount = 5
 
 	taskLockPrefix   = "cron:task:lock:"
 	subscribeChannel = "cron:subscribe:channel"
@@ -35,6 +37,8 @@ const (
 	add    = "add"
 	remove = "remove"
 	update = "update"
+
+	ExecTypeGroup = "group"
 )
 
 var (
@@ -42,19 +46,19 @@ var (
 	_f   *Factory
 )
 
-type Repo interface {
-	biz.WorkerRepo
-	biz.TaskRepo
-	biz.LogRepo
+type Repo struct {
+	Task   task.Repo
+	Log    log.Repo
+	Worker worker.Repo
 }
 
 type Factory struct {
-	repo   Repo
+	repo   *Repo
 	store  *store
 	rdb    *redis.Client
 	pubSub *redis.PubSub
 	cron   *cron.Cron
-	log    *log.Helper
+	log    *klog.Helper
 	ctx    kratosx.Context
 	wg     sync.WaitGroup
 	closer atomic.Bool
@@ -64,7 +68,7 @@ func GlobalFactory() *Factory {
 	return _f
 }
 
-func New(repo Repo) *Factory {
+func Init(repo *Repo) *Factory {
 	once.Do(func() {
 		ctx := kratosx.MustContext(context.Background())
 		location, _ := time.LoadLocation("Asia/Shanghai")
@@ -211,7 +215,7 @@ func (t *Factory) lockScheduler(id uint32, spec string) func() {
 		if is, _ := t.rdb.SetNX(context.Background(), key, 1, expire).Result(); is {
 			t.wg.Add(1)
 			defer t.wg.Done()
-			if err := t.scheduler(id); err != nil {
+			if err := t.scheduler(id, false); err != nil {
 				t.log.Errorw("exec task error", err.Error())
 				return
 			}
@@ -219,57 +223,59 @@ func (t *Factory) lockScheduler(id uint32, spec string) func() {
 	}
 }
 
-func (t *Factory) Scheduler(id uint32) error {
-	return t.scheduler(id)
+func (t *Factory) Scheduler(id uint32, force bool) error {
+	return t.scheduler(id, force)
 }
 
 func (t *Factory) genUid() string {
-	return util.MD5ToUpper([]byte(uuid.NewString()))
+	return crypto.MD5ToUpper([]byte(uuid.NewString()))
 }
 
-func (t *Factory) scheduler(id uint32) error {
+func (t *Factory) scheduler(id uint32, force bool) error {
 	t.log.Infof("start scheduler task：%d", id)
-	tk, err := t.repo.GetTask(t.ctx, id)
+	tk, err := t.repo.Task.GetTask(t.ctx, id)
 	if err != nil {
 		return err
 	}
-	if tk.Status == biz.TaskDisabled {
-		return errors.New("task is disabled")
+	if !force {
+		if tk.Status == nil || !*tk.Status {
+			return errors.New("task is disabled")
+		}
 	}
 
 	var (
-		wk *biz.Worker
+		wk *worker.Worker
 	)
-	if tk.ExecType == biz.ExecTypeGroup {
-		wk, err = t.repo.GetWorkerByGroupId(t.ctx, *tk.WorkerGroupId)
+	if tk.ExecType == ExecTypeGroup {
+		wk, err = t.repo.Worker.GetWorkerByGroupId(t.ctx, *tk.WorkerGroupId)
 	} else {
-		wk, err = t.repo.GetWorker(t.ctx, *tk.WorkerId)
+		wk, err = t.repo.Worker.GetWorker(t.ctx, *tk.WorkerId)
 	}
 	if err != nil {
 		return err
 	}
 
 	uid := t.genUid()
-	if _, err := t.repo.AddLog(t.ctx, t.makeLog(uid, tk, wk)); err != nil {
+	if _, err := t.repo.Log.CreateLog(t.ctx, t.makeLog(uid, tk, wk)); err != nil {
 		return err
 	}
 
 	// 连接worker
 	ctx := context.Background()
-	conn, err := grpc.DialInsecure(ctx, grpc.WithEndpoint(wk.IP))
+	conn, err := grpc.DialInsecure(ctx, grpc.WithEndpoint(wk.Ip))
 	if err != nil {
 		return err
 	}
 
-	client := clientV1.NewServiceClient(conn)
+	client := clientV1.NewClientClient(conn)
 	req := &clientV1.ExecTaskRequest{
-		Id:            tk.ID,
+		Id:            tk.Id,
 		Type:          tk.ExecType,
 		Value:         tk.ExecValue,
-		ExpectCode:    *tk.ExpectCode,
-		RetryCount:    *tk.RetryCount,
-		RetryWaitTime: *tk.RetryWaitTime,
-		MaxExecTime:   *tk.MaxExecTime,
+		ExpectCode:    tk.ExpectCode,
+		RetryCount:    tk.RetryCount,
+		RetryWaitTime: tk.RetryWaitTime,
+		MaxExecTime:   tk.MaxExecTime,
 		Uuid:          uid,
 	}
 	stream, err := client.ExecTask(ctx, req)
@@ -278,40 +284,50 @@ func (t *Factory) scheduler(id uint32) error {
 	}
 
 	var (
-		rer error
-		msg *clientV1.ExecTaskReply
+		rer   error
+		msg   *clientV1.ExecTaskReply
+		count = 0
 	)
 	for {
 		msg, rer = stream.Recv()
 		if rer != nil {
-			if rer == io.EOF || apierrors.IsExecTaskFail(rer) {
+			if rer == io.EOF || apierrors.IsExecTaskFailError(rer) {
 				if rer == io.EOF {
 					rer = nil
 				}
 				break
 			}
 
-			for t.repo.TaskIsRunning(t.ctx, uid) {
-				if stream, err = client.ExecTask(ctx, req); err == nil {
-					break
+			for t.repo.Log.IsRunning(t.ctx, uid) {
+				if count < maxRetryCount {
+					count++
+					wait := maxWaitTime / maxRetryCount * count
+					if stream, err = client.ExecTask(ctx, req); err == nil {
+						break
+					}
+					time.Sleep(time.Duration(wait) * time.Second)
+				} else {
+					rer = errors.New("exceeded retry attempts")
+					if err := t.repo.Log.UpdateLogStatus(t.ctx, uid, rer); err != nil {
+						t.log.Errorw("update log status error", err.Error())
+					}
+					return rer
 				}
-				wt := rand.Intn(maxWaitTime)
-				time.Sleep(time.Duration(wt) * time.Second)
 			}
 		}
 
 		b, _ := json.Marshal(msg)
-		if err := t.repo.AppendLogContent(t.ctx, uid, string(b)); err != nil {
+		if err := t.repo.Log.AppendLogContent(t.ctx, uid, string(b)); err != nil {
 			t.log.Errorw("append log error", err.Error())
 		}
 	}
-	if err := t.repo.UpdateLogStatus(t.ctx, uid, rer); err != nil {
+	if err := t.repo.Log.UpdateLogStatus(t.ctx, uid, rer); err != nil {
 		t.log.Errorw("update log status error", err.Error())
 	}
 	return rer
 }
 
-func (t *Factory) makeLog(uuid string, task *biz.Task, worker *biz.Worker) *biz.Log {
+func (t *Factory) makeLog(uuid string, task *task.Task, worker *worker.Worker) *log.Log {
 	tb, _ := json.Marshal(task)
 	wb, _ := json.Marshal(worker)
 	start := clientV1.ExecTaskReply{
@@ -320,15 +336,15 @@ func (t *Factory) makeLog(uuid string, task *biz.Task, worker *biz.Worker) *biz.
 		Time:    uint32(time.Now().Unix()),
 	}
 	b, _ := json.Marshal(start)
-	return &biz.Log{
+	return &log.Log{
 		Uuid:           uuid,
-		TaskId:         task.ID,
+		TaskId:         task.Id,
 		TaskSnapshot:   string(tb),
-		WorkerId:       worker.ID,
+		WorkerId:       worker.Id,
 		WorkerSnapshot: string(wb),
 		Content:        string(b),
-		Start:          time.Now().Unix(),
-		Status:         biz.ExecRunning,
+		StartAt:        time.Now().Unix(),
+		Status:         log.ExecRunning,
 	}
 }
 
@@ -344,7 +360,7 @@ func (t *Factory) startRepair() {
 
 func (t *Factory) repair(ctx kratosx.Context) {
 	specs := t.cron.Specs()
-	source := t.repo.GetSpecs(ctx)
+	source := t.repo.Task.GetSpecs(ctx)
 
 	for k, v := range source {
 		val, ok := specs[k]
@@ -365,4 +381,20 @@ func (t *Factory) repair(ctx kratosx.Context) {
 			t.cron.Remove(k)
 		}
 	}
+}
+
+func (t *Factory) CancelExec(ctx kratosx.Context, uuid string) error {
+	ip, err := t.repo.Log.GetTargetIpByUuid(ctx, uuid)
+	if err != nil {
+		return err
+	}
+	conn, err := grpc.DialInsecure(ctx, grpc.WithEndpoint(ip))
+	if err != nil {
+		return err
+	}
+	client := clientV1.NewClientClient(conn)
+	if _, err = client.CancelExecTask(ctx, &clientV1.CancelExecTaskRequest{Uuid: uuid}); err != nil {
+		return err
+	}
+	return t.repo.Log.CancelTaskByUUID(ctx, uuid)
 }

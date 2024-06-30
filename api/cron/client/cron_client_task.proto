@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package cron.api.cron.client.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.client.v1";
+option java_outer_classname = "ClientV1";
+
+import "validate/validate.proto";
+import "google/protobuf/struct.proto";
+
+message CancelExecTaskRequest{
+  string uuid = 1;
+}
+
+message ExecTaskRequest{
+  uint32 id = 1;
+  string type = 2;
+  string value = 3;
+  uint32 expectCode = 4;
+  uint32 retryCount = 5;
+  uint32 retryWaitTime = 6;
+  uint32 maxExecTime = 7;
+  string uuid = 8;
+}
+
+message ExecTaskReply{
+  string type = 1;
+  string content = 2;
+  uint32 time = 3;
+}

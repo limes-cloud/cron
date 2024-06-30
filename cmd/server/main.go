@@ -2,47 +2,47 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	configure "github.com/limes-cloud/configure/api/client"
+	"github.com/limes-cloud/configure/api/configure/client"
 	"github.com/limes-cloud/kratosx"
 	"github.com/limes-cloud/kratosx/config"
+	"github.com/limes-cloud/kratosx/pkg/printx"
 	_ "go.uber.org/automaxprocs"
 
-	v1 "github.com/limes-cloud/cron/api/server/v1"
 	"github.com/limes-cloud/cron/internal/server/conf"
-	"github.com/limes-cloud/cron/internal/server/factory/task"
 	"github.com/limes-cloud/cron/internal/server/service"
 )
 
 func main() {
 	app := kratosx.New(
-		kratosx.Config(configure.NewFromEnv()),
+		kratosx.Config(client.NewFromEnv()),
 		kratosx.RegistrarServer(RegisterServer),
-		kratosx.Options(kratos.BeforeStop(func(ctx context.Context) error {
-			task.GlobalFactory().Close()
-			return nil
-		})),
+		kratosx.Options(
+			kratos.AfterStart(func(ctx context.Context) error {
+				kt := kratosx.MustContext(ctx)
+				printx.ArtFont(fmt.Sprintf("Hello %s !", kt.Name()))
+				return nil
+			}),
+		),
 	)
 
 	if err := app.Run(); err != nil {
-		log.Fatal(err.Error())
+		log.Println("run service fail", err.Error())
 	}
 }
 
 func RegisterServer(c config.Config, hs *http.Server, gs *grpc.Server) {
 	cfg := &conf.Config{}
-	c.ScanWatch("business", func(value config.Value) {
-		if err := value.Scan(cfg); err != nil {
-			log.Error("business 配置变更失败")
-		} else {
-			log.Error("business 配置变更成功")
-		}
-	})
-	srv := service.New(cfg)
-	v1.RegisterServiceHTTPServer(hs, srv)
-	v1.RegisterServiceServer(gs, srv)
+	// c.ScanWatch("business", func(value config.Value) {
+	//	if err := value.Scan(cfg); err != nil {
+	//		log.Printf("business配置变更失败：%s", err.Error())
+	//	}
+	// })
+	// 注册服务
+	service.New(cfg, hs, gs)
 }

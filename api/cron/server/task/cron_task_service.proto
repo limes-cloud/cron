@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package cron.api.server.cron.task.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.task.v1";
+option java_outer_classname = "TaskV1";
+
+import "api/cron/server/task/cron_task_group.proto";
+import "google/api/annotations.proto";
+import "api/cron/server/task/cron_task.proto";
+
+service Task{
+
+  // GetTaskGroup 获取指定的任务分组
+  rpc GetTaskGroup (GetTaskGroupRequest) returns (GetTaskGroupReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/task_group",
+    };
+  }
+
+  // ListTaskGroup 获取任务分组列表
+  rpc ListTaskGroup (ListTaskGroupRequest) returns (ListTaskGroupReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/task_groups",
+    };
+  }
+
+  // CreateTaskGroup 创建任务分组
+  rpc CreateTaskGroup (CreateTaskGroupRequest) returns (CreateTaskGroupReply) {
+    option (google.api.http) = {
+      post: "/cron/api/v1/task_group",
+      body: "*"
+    };
+  }
+
+  // UpdateTaskGroup 更新任务分组
+  rpc UpdateTaskGroup (UpdateTaskGroupRequest) returns (UpdateTaskGroupReply) {
+    option (google.api.http) = {
+      put: "/cron/api/v1/task_group",
+      body: "*"
+    };
+  }
+
+  // DeleteTaskGroup 删除任务分组
+  rpc DeleteTaskGroup (DeleteTaskGroupRequest) returns (DeleteTaskGroupReply) {
+    option (google.api.http) = {
+      delete: "/cron/api/v1/task_group",
+    };
+  }
+
+  // GetTask 获取指定的任务信息
+  rpc GetTask (GetTaskRequest) returns (GetTaskReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/task",
+    };
+  }
+
+  // ListTask 获取任务信息列表
+  rpc ListTask (ListTaskRequest) returns (ListTaskReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/tasks",
+    };
+  }
+
+  // CreateTask 创建任务信息
+  rpc CreateTask (CreateTaskRequest) returns (CreateTaskReply) {
+    option (google.api.http) = {
+      post: "/cron/api/v1/task",
+      body: "*"
+    };
+  }
+
+  // UpdateTask 更新任务信息
+  rpc UpdateTask (UpdateTaskRequest) returns (UpdateTaskReply) {
+    option (google.api.http) = {
+      put: "/cron/api/v1/task",
+      body: "*"
+    };
+  }
+
+  // UpdateTaskStatus 更新任务信息状态
+  rpc UpdateTaskStatus (UpdateTaskStatusRequest) returns (UpdateTaskStatusReply) {
+    option (google.api.http) = {
+      put: "/cron/api/v1/task/status",
+      body: "*"
+    };
+  }
+
+  // DeleteTask 删除任务信息
+  rpc DeleteTask (DeleteTaskRequest) returns (DeleteTaskReply) {
+    option (google.api.http) = {
+      delete: "/cron/api/v1/task",
+    };
+  }
+
+  // ExecTask 立即执行任务
+  rpc ExecTask(ExecTaskRequest) returns(ExecTaskReply){
+    option (google.api.http) = {
+      post: "/cron/api/v1/task/exec",
+      body: "*"
+    };
+  }
+
+  // CancelExecTask 取消指定任务
+  rpc CancelExecTask(CancelExecTaskRequest) returns(CancelExecTaskReply){
+    option (google.api.http) = {
+      post: "/cron/api/v1/task/cancel",
+      body: "*"
+    };
+  }
+
+}

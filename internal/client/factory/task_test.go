@@ -26,7 +26,7 @@ func TestFactory_ExecTask(t *testing.T) {
 		Uuid:          "1",
 		Type:          "shell",
 		Value:         readShellValue("examples/for.sh"),
-		MaxExecTime:   2,
+		MaxExecTime:   11,
 		RetryCount:    3,
 		RetryWaitTime: 2,
 	}, func(reply *biz.ExecTaskReply) error {

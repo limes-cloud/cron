@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -78,7 +79,7 @@ func NewParser(options ParseOption) Parser {
 	if optionals > 1 {
 		panic("multiple optionals may not be configured")
 	}
-	return Parser{options}
+	return Parser{options: options}
 }
 
 // Parse returns a new crontab schedule representing the given spec.
@@ -86,7 +87,7 @@ func NewParser(options ParseOption) Parser {
 // It accepts crontab specs and features configured by NewParser.
 func (p Parser) Parse(spec string) (Schedule, error) {
 	if len(spec) == 0 {
-		return nil, fmt.Errorf("empty spec string")
+		return nil, errors.New("empty spec string")
 	}
 
 	// Extract timezone if present
@@ -168,7 +169,7 @@ func normalizeFields(fields []string, options ParseOption) ([]string, error) {
 		optionals++
 	}
 	if optionals > 1 {
-		return nil, fmt.Errorf("multiple optionals may not be configured")
+		return nil, errors.New("multiple optionals may not be configured")
 	}
 
 	// Figure out how many fields we need
@@ -196,7 +197,7 @@ func normalizeFields(fields []string, options ParseOption) ([]string, error) {
 		case options&SecondOptional > 0:
 			fields = append([]string{defaults[0]}, fields...)
 		default:
-			return nil, fmt.Errorf("unknown optional field")
+			return nil, errors.New("unknown optional field")
 		}
 	}
 
@@ -419,7 +420,6 @@ func parseDescriptor(descriptor string, loc *time.Location) (Schedule, error) {
 			Dow:      all(dow),
 			Location: loc,
 		}, nil
-
 	}
 
 	const every = "@every "

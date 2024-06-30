@@ -19,11 +19,11 @@ type bounds struct {
 
 // The bounds for each field.
 var (
-	seconds = bounds{0, 59, nil}
-	minutes = bounds{0, 59, nil}
-	hours   = bounds{0, 23, nil}
-	dom     = bounds{1, 31, nil}
-	months  = bounds{1, 12, map[string]uint{
+	seconds = bounds{min: 0, max: 59, names: nil}
+	minutes = bounds{min: 0, max: 59, names: nil}
+	hours   = bounds{min: 0, max: 23, names: nil}
+	dom     = bounds{min: 1, max: 31, names: nil}
+	months  = bounds{min: 1, max: 12, names: map[string]uint{
 		"jan": 1,
 		"feb": 2,
 		"mar": 3,
@@ -37,7 +37,7 @@ var (
 		"nov": 11,
 		"dec": 12,
 	}}
-	dow = bounds{0, 6, map[string]uint{
+	dow = bounds{min: 0, max: 6, names: map[string]uint{
 		"sun": 0,
 		"mon": 1,
 		"tue": 2,

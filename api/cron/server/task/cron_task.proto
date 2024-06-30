@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package cron.api.server.cron.task.v1;
+
+option go_package = "./v1;v1";
+option java_multiple_files = true;
+option java_package = "cron.api.server.cron.task.v1";
+option java_outer_classname = "TaskV1";
+
+import "validate/validate.proto";
+
+message GetTaskRequest {
+  optional uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+}
+
+message GetTaskReply {
+  message Group{
+    string name = 1;
+  }
+
+  message Worker{
+    string name = 1;
+  }
+
+  message WorkerGroup{
+    string name = 1;
+  }
+  uint32 id = 1;
+  uint32 groupId = 2;
+  string name = 3;
+  string tag = 4;
+  string spec = 5;
+  optional bool status = 6;
+  string workerType = 7;
+  optional uint32 workerGroupId = 8;
+  optional uint32 workerId = 9;
+  string execType = 10;
+  string execValue = 11;
+  uint32 expectCode = 12;
+  uint32 retryCount = 13;
+  uint32 retryWaitTime = 14;
+  uint32 maxExecTime = 15;
+  string version = 16;
+  optional string description = 17;
+  uint32 createdAt = 18;
+  uint32 updatedAt = 19;
+  optional Group group = 20;
+  optional Worker worker = 21;
+  optional WorkerGroup workerGroup = 22;
+}
+
+message ListTaskRequest {
+  uint32 page = 1[(validate.rules).uint32 = {gt: 0}];
+  uint32 pageSize = 2[(validate.rules).uint32 = {gt: 0,lte:50}];
+  optional string order = 3[(validate.rules).string = {in: ["asc","desc"]}];
+  optional string orderBy = 4[(validate.rules).string = {in: ["id","created_at","updated_at"]}];
+  optional uint32 groupId = 5;
+  optional string name = 6;
+  optional string tag = 7;
+  optional bool status = 8;
+}
+
+message ListTaskReply {
+  message Task {
+    uint32 id = 1;
+    uint32 groupId = 2;
+    string name = 3;
+    string tag = 4;
+    string spec = 5;
+    optional bool status = 6;
+    string workerType = 7;
+    uint32 workerGroupId = 8;
+    uint32 workerId = 9;
+    string execType = 10;
+    string execValue = 11;
+    uint32 expectCode = 12;
+    uint32 retryCount = 13;
+    uint32 retryWaitTime = 14;
+    uint32 maxExecTime = 15;
+    string version = 16;
+    optional string description = 17;
+    uint32 createdAt = 18;
+    uint32 updatedAt = 19;
+
+  }
+
+  uint32 total = 1;
+  repeated Task list = 2;
+}
+
+message CreateTaskRequest {
+  uint32 groupId = 1[(validate.rules).uint32 = {gt: 0}];
+  string name = 2[(validate.rules).string = {min_len: 1}];
+  string tag = 3[(validate.rules).string = {min_len: 1}];
+  string spec = 4[(validate.rules).string = {min_len: 1}];
+  optional bool status = 5;
+  string workerType = 6[(validate.rules).string = {min_len: 1}];
+  optional uint32 workerGroupId = 7[(validate.rules).uint32 = {gt: 0}];
+  optional uint32 workerId = 8[(validate.rules).uint32 = {gt: 0}];
+  string execType = 9[(validate.rules).string = {min_len: 1}];
+  string execValue = 10[(validate.rules).string = {min_len: 1}];
+  uint32 expectCode = 11;
+  uint32 retryCount = 12;
+  uint32 retryWaitTime = 13;
+  uint32 maxExecTime = 14;
+  optional string description = 15;
+}
+
+message CreateTaskReply {
+  uint32 id = 1;
+}
+
+message UpdateTaskRequest {
+  uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+  uint32 groupId = 2[(validate.rules).uint32 = {gt: 0}];
+  string name = 3[(validate.rules).string = {min_len: 1}];
+  string tag = 4[(validate.rules).string = {min_len: 1}];
+  string spec = 5[(validate.rules).string = {min_len: 1}];
+  string workerType = 6[(validate.rules).string = {min_len: 1}];
+  optional uint32 workerGroupId = 7[(validate.rules).uint32 = {gt: 0}];
+  optional uint32 workerId = 8[(validate.rules).uint32 = {gt: 0}];
+  string execType = 9[(validate.rules).string = {min_len: 1}];
+  string execValue = 10[(validate.rules).string = {min_len: 1}];
+  uint32 expectCode = 11;
+  uint32 retryCount = 12;
+  uint32 retryWaitTime = 13;
+  uint32 maxExecTime = 14;
+  optional string description = 15;
+}
+
+message UpdateTaskReply {
+}
+
+message UpdateTaskStatusRequest {
+  uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+  bool status = 2;
+}
+
+message UpdateTaskStatusReply {
+}
+
+message DeleteTaskRequest {
+  uint32 id = 1[(validate.rules).uint32 = {gte:0}];
+}
+
+message DeleteTaskReply {
+}
+
+message ExecTaskRequest{
+  uint32 id = 1[(validate.rules).uint32 = {gt:0}];
+}
+
+message ExecTaskReply{
+}
+
+message CancelExecTaskRequest{
+  string uuid = 1[(validate.rules).string = {min_len:1}];
+}
+
+message CancelExecTaskReply{
+}

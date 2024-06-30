@@ -12,7 +12,7 @@ import (
 	"github.com/limes-cloud/kratosx"
 	"github.com/limes-cloud/kratosx/library/pool"
 
-	v1 "github.com/limes-cloud/cron/api/client/v1"
+	v1 "github.com/limes-cloud/cron/api/cron/client/v1"
 )
 
 const (
@@ -87,7 +87,7 @@ func (w *Factory) ping(ctx kratosx.Context, ip string) error {
 	if err != nil {
 		return err
 	}
-	_, err = v1.NewServiceClient(conn).Healthy(ctx, &empty.Empty{})
+	_, err = v1.NewClientClient(conn).Healthy(ctx, &empty.Empty{})
 	return err
 }
 

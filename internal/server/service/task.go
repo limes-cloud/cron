@@ -3,114 +3,255 @@ package service
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/limes-cloud/kratosx"
-	"github.com/limes-cloud/kratosx/pkg/util"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"github.com/limes-cloud/kratosx/pkg/valx"
 
-	"github.com/limes-cloud/cron/api/errors"
-	v1 "github.com/limes-cloud/cron/api/server/v1"
-	"github.com/limes-cloud/cron/internal/server/biz"
+	"github.com/limes-cloud/cron/api/cron/errors"
+	pb "github.com/limes-cloud/cron/api/cron/server/task/v1"
+	"github.com/limes-cloud/cron/internal/server/biz/task"
+	"github.com/limes-cloud/cron/internal/server/conf"
+	"github.com/limes-cloud/cron/internal/server/data"
+	ft "github.com/limes-cloud/cron/internal/server/factory/task"
 )
 
-func (s *Service) AllTaskGroup(ctx context.Context, _ *emptypb.Empty) (*v1.AllTaskGroupReply, error) {
-	list, err := s.task.AllTaskGroup(kratosx.MustContext(ctx))
+type TaskService struct {
+	pb.UnimplementedTaskServer
+	uc *task.UseCase
+}
+
+func NewTaskService(conf *conf.Config) *TaskService {
+	return &TaskService{
+		uc: task.NewUseCase(conf, data.NewTaskRepo(), ft.GlobalFactory()),
+	}
+}
+
+func init() {
+	register(func(c *conf.Config, hs *http.Server, gs *grpc.Server) {
+		srv := NewTaskService(c)
+		pb.RegisterTaskHTTPServer(hs, srv)
+		pb.RegisterTaskServer(gs, srv)
+	})
+}
+
+// GetTaskGroup 获取指定的任务分组
+func (s *TaskService) GetTaskGroup(c context.Context, req *pb.GetTaskGroupRequest) (*pb.GetTaskGroupReply, error) {
+	var (
+		in  = task.GetTaskGroupRequest{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
+	}
+
+	result, err := s.uc.GetTaskGroup(ctx, &in)
 	if err != nil {
 		return nil, err
 	}
 
-	reply := v1.AllTaskGroupReply{}
-	if err := util.Transform(list, &reply.List); err != nil {
-		return nil, errors.Transform()
+	reply := pb.GetTaskGroupReply{}
+	if err := valx.Transform(result, &reply); err != nil {
+		ctx.Logger().Warnw("msg", "reply transform err", "err", err.Error())
+		return nil, errors.TransformError()
+	}
+	return &reply, nil
+}
+
+// ListTaskGroup 获取任务分组列表
+func (s *TaskService) ListTaskGroup(c context.Context, req *pb.ListTaskGroupRequest) (*pb.ListTaskGroupReply, error) {
+	var (
+		in  = task.ListTaskGroupRequest{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
+	}
+
+	result, total, err := s.uc.ListTaskGroup(ctx, &in)
+	if err != nil {
+		return nil, err
+	}
+
+	reply := pb.ListTaskGroupReply{Total: total}
+	if err := valx.Transform(result, &reply.List); err != nil {
+		ctx.Logger().Warnw("msg", "reply transform err", "err", err.Error())
+		return nil, errors.TransformError()
 	}
 
 	return &reply, nil
 }
 
-func (s *Service) AddTaskGroup(ctx context.Context, in *v1.AddTaskGroupRequest) (*v1.AddTaskGroupReply, error) {
-	wk := biz.TaskGroup{}
-	if err := util.Transform(in, &wk); err != nil {
-		return nil, errors.TransformFormat(err.Error())
+// CreateTaskGroup 创建任务分组
+func (s *TaskService) CreateTaskGroup(c context.Context, req *pb.CreateTaskGroupRequest) (*pb.CreateTaskGroupReply, error) {
+	var (
+		in  = task.TaskGroup{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
 	}
 
-	id, err := s.task.AddTaskGroup(kratosx.MustContext(ctx), &wk)
+	id, err := s.uc.CreateTaskGroup(ctx, &in)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.AddTaskGroupReply{Id: id}, nil
+	return &pb.CreateTaskGroupReply{Id: id}, nil
 }
 
-func (s *Service) UpdateTaskGroup(ctx context.Context, in *v1.UpdateTaskGroupRequest) (*emptypb.Empty, error) {
-	wk := biz.TaskGroup{}
-	if err := util.Transform(in, &wk); err != nil {
-		return nil, errors.TransformFormat(err.Error())
+// UpdateTaskGroup 更新任务分组
+func (s *TaskService) UpdateTaskGroup(c context.Context, req *pb.UpdateTaskGroupRequest) (*pb.UpdateTaskGroupReply, error) {
+	var (
+		in  = task.TaskGroup{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
 	}
 
-	return nil, s.task.UpdateTaskGroup(kratosx.MustContext(ctx), &wk)
-}
-
-func (s *Service) DeleteTaskGroup(ctx context.Context, in *v1.DeleteTaskGroupRequest) (*emptypb.Empty, error) {
-	return nil, s.task.DeleteTaskGroup(kratosx.MustContext(ctx), in.Id)
-}
-
-func (s *Service) PageTask(ctx context.Context, in *v1.PageTaskRequest) (*v1.PageTaskReply, error) {
-	var req biz.PageTaskRequest
-	if err := util.Transform(in, &req); err != nil {
-		return nil, errors.Transform()
+	if err := s.uc.UpdateTaskGroup(ctx, &in); err != nil {
+		return nil, err
 	}
 
-	list, total, err := s.task.PageTask(kratosx.MustContext(ctx), &req)
+	return &pb.UpdateTaskGroupReply{}, nil
+}
+
+// DeleteTaskGroup 删除任务分组
+func (s *TaskService) DeleteTaskGroup(c context.Context, req *pb.DeleteTaskGroupRequest) (*pb.DeleteTaskGroupReply, error) {
+	err := s.uc.DeleteTaskGroup(kratosx.MustContext(c), req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.DeleteTaskGroupReply{}, nil
+}
+
+// GetTask 获取指定的任务信息
+func (s *TaskService) GetTask(c context.Context, req *pb.GetTaskRequest) (*pb.GetTaskReply, error) {
+	var (
+		in  = task.GetTaskRequest{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
+	}
+
+	result, err := s.uc.GetTask(ctx, &in)
 	if err != nil {
 		return nil, err
 	}
 
-	reply := v1.PageTaskReply{Total: total}
-	if err := util.Transform(list, &reply.List); err != nil {
-		return nil, errors.Transform()
+	reply := pb.GetTaskReply{}
+	if err := valx.Transform(result, &reply); err != nil {
+		ctx.Logger().Warnw("msg", "reply transform err", "err", err.Error())
+		return nil, errors.TransformError()
+	}
+	return &reply, nil
+}
+
+// ListTask 获取任务信息列表
+func (s *TaskService) ListTask(c context.Context, req *pb.ListTaskRequest) (*pb.ListTaskReply, error) {
+	var (
+		in  = task.ListTaskRequest{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
+	}
+
+	result, total, err := s.uc.ListTask(ctx, &in)
+	if err != nil {
+		return nil, err
+	}
+
+	reply := pb.ListTaskReply{Total: total}
+	if err := valx.Transform(result, &reply.List); err != nil {
+		ctx.Logger().Warnw("msg", "reply transform err", "err", err.Error())
+		return nil, errors.TransformError()
 	}
 
 	return &reply, nil
 }
 
-func (s *Service) AddTask(ctx context.Context, in *v1.AddTaskRequest) (*v1.AddTaskReply, error) {
-	wk := biz.Task{}
-	if err := util.Transform(in, &wk); err != nil {
-		return nil, errors.TransformFormat(err.Error())
+// CreateTask 创建任务信息
+func (s *TaskService) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskReply, error) {
+	var (
+		in  = task.Task{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
 	}
 
-	id, err := s.task.AddTask(kratosx.MustContext(ctx), &wk)
+	id, err := s.uc.CreateTask(ctx, &in)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.AddTaskReply{Id: id}, nil
+	return &pb.CreateTaskReply{Id: id}, nil
 }
 
-func (s *Service) UpdateTask(ctx context.Context, in *v1.UpdateTaskRequest) (*emptypb.Empty, error) {
-	wk := biz.Task{}
-	if err := util.Transform(in, &wk); err != nil {
-		return nil, errors.TransformFormat(err.Error())
+// UpdateTask 更新任务信息
+func (s *TaskService) UpdateTask(c context.Context, req *pb.UpdateTaskRequest) (*pb.UpdateTaskReply, error) {
+	var (
+		in  = task.Task{}
+		ctx = kratosx.MustContext(c)
+	)
+
+	if err := valx.Transform(req, &in); err != nil {
+		ctx.Logger().Warnw("msg", "req transform err", "err", err.Error())
+		return nil, errors.TransformError()
 	}
 
-	return nil, s.task.UpdateTask(kratosx.MustContext(ctx), &wk)
+	if err := s.uc.UpdateTask(ctx, &in); err != nil {
+		return nil, err
+	}
+
+	return &pb.UpdateTaskReply{}, nil
 }
 
-func (s *Service) EnableTask(ctx context.Context, in *v1.EnableTaskRequest) (*emptypb.Empty, error) {
-	return nil, s.task.EnableTask(kratosx.MustContext(ctx), in.Id)
+// UpdateTaskStatus 更新任务信息状态
+func (s *TaskService) UpdateTaskStatus(c context.Context, req *pb.UpdateTaskStatusRequest) (*pb.UpdateTaskStatusReply, error) {
+	return &pb.UpdateTaskStatusReply{}, s.uc.UpdateTaskStatus(kratosx.MustContext(c), req.Id, req.Status)
 }
 
-func (s *Service) DisableTask(ctx context.Context, in *v1.DisableTaskRequest) (*emptypb.Empty, error) {
-	return nil, s.task.DisableTask(kratosx.MustContext(ctx), in.Id)
+// DeleteTask 删除任务信息
+func (s *TaskService) DeleteTask(c context.Context, req *pb.DeleteTaskRequest) (*pb.DeleteTaskReply, error) {
+	err := s.uc.DeleteTask(kratosx.MustContext(c), req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.DeleteTaskReply{}, nil
 }
 
-func (s *Service) CancelExecTask(ctx context.Context, in *v1.CancelExecTaskRequest) (*emptypb.Empty, error) {
-	return nil, s.task.CancelTask(kratosx.MustContext(ctx), in.Uuid)
+// ExecTask 执行任务信息
+func (s *TaskService) ExecTask(c context.Context, req *pb.ExecTaskRequest) (*pb.ExecTaskReply, error) {
+	err := s.uc.ExecTask(kratosx.MustContext(c), req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.ExecTaskReply{}, nil
 }
 
-func (s *Service) ExecTask(ctx context.Context, in *v1.ExecTaskRequest) (*emptypb.Empty, error) {
-	return nil, s.task.ExecTask(kratosx.MustContext(ctx), in.Id)
-}
-
-func (s *Service) DeleteTask(ctx context.Context, in *v1.DeleteTaskRequest) (*emptypb.Empty, error) {
-	return nil, s.task.DeleteTask(kratosx.MustContext(ctx), in.Id)
+// CancelExecTask 取消任务信息
+func (s *TaskService) CancelExecTask(c context.Context, req *pb.CancelExecTaskRequest) (*pb.CancelExecTaskReply, error) {
+	err := s.uc.CancelExecTask(kratosx.MustContext(c), req.Uuid)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.CancelExecTaskReply{}, nil
 }
