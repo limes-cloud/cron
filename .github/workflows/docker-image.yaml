@@ -60,6 +60,6 @@ jobs:  # workflow中的job
         with:
           context: .
           push: true
-          build: ./ClientDockerfile
+          file: ./ClientDockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
