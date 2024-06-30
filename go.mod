@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/limes-cloud/configure v1.0.39
-	github.com/limes-cloud/kratosx v1.0.45
+	github.com/limes-cloud/kratosx v1.0.46
 	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20240624140628-dc46fd24d27d
 	google.golang.org/grpc v1.64.0
@@ -134,4 +134,3 @@ require (
 	modernc.org/sqlite v1.26.0 // indirect
 )
 
-replace github.com/limes-cloud/kratosx v1.0.45 => ../../framework/kratosx
