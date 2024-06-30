@@ -8,11 +8,11 @@ ADD go.sum .
 RUN go mod download
 WORKDIR /go/build
 ADD . .
-RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix cgo -o cron cmd/client/main.go
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix cgo -o cronclient cmd/client/main.go
 # 构建执行镜像
 FROM alpine
 WORKDIR /go/build
 COPY ./deploy/ /go/build/deploy/
 COPY ./internal/client/conf/ /go/build/internal/client/conf/
-COPY --from=build /go/build/cron /go/build/cron
-CMD ["./cron"]
+COPY --from=build /go/build/cronclient /go/build/cronclient
+CMD ["./cronclient"]
