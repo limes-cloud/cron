@@ -27,10 +27,11 @@ jobs:  # workflow中的job
           images: ${{ secrets.DOCKERHUB_REGISTRY }}/limes-cloud/cron
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4 # docker build & push
+        uses: docker/build-push-action@v2 # docker build & push
         with:
+          context: .
           push: true
-          build: ServerDockerfile
+          file: ./ServerDockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   push_client_to_registry: # job的名字
@@ -57,7 +58,8 @@ jobs:  # workflow中的job
       - name: Build and push Docker image
         uses: docker/build-push-action@v4 # docker build & push
         with:
+          context: .
           push: true
-          build: ClientDockerfile
+          build: ./ClientDockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
