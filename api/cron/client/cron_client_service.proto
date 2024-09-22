@@ -13,7 +13,7 @@ import "google/api/annotations.proto";
 import "api/cron/client/cron_client_task.proto";
 
 // 应用服务服务接口定义，渠道主要是配置用户登录时的可选登录方法
-service Client{
+service Task{
   rpc Healthy(google.protobuf.Empty) returns(google.protobuf.Empty);
   rpc ExecTask(ExecTaskRequest) returns(stream ExecTaskReply);
   rpc CancelExecTask(CancelExecTaskRequest) returns(google.protobuf.Empty);

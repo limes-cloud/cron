@@ -20,43 +20,43 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Client_Healthy_FullMethodName        = "/cron.api.cron.client.v1.Client/Healthy"
-	Client_ExecTask_FullMethodName       = "/cron.api.cron.client.v1.Client/ExecTask"
-	Client_CancelExecTask_FullMethodName = "/cron.api.cron.client.v1.Client/CancelExecTask"
+	Task_Healthy_FullMethodName        = "/cron.api.cron.client.v1.Task/Healthy"
+	Task_ExecTask_FullMethodName       = "/cron.api.cron.client.v1.Task/ExecTask"
+	Task_CancelExecTask_FullMethodName = "/cron.api.cron.client.v1.Task/CancelExecTask"
 )
 
-// ClientClient is the client API for Client service.
+// TaskClient is the client API for Task service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ClientClient interface {
+type TaskClient interface {
 	Healthy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ExecTask(ctx context.Context, in *ExecTaskRequest, opts ...grpc.CallOption) (Client_ExecTaskClient, error)
+	ExecTask(ctx context.Context, in *ExecTaskRequest, opts ...grpc.CallOption) (Task_ExecTaskClient, error)
 	CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
-type clientClient struct {
+type taskClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewClientClient(cc grpc.ClientConnInterface) ClientClient {
-	return &clientClient{cc}
+func NewTaskClient(cc grpc.ClientConnInterface) TaskClient {
+	return &taskClient{cc}
 }
 
-func (c *clientClient) Healthy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *taskClient) Healthy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Client_Healthy_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Task_Healthy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *clientClient) ExecTask(ctx context.Context, in *ExecTaskRequest, opts ...grpc.CallOption) (Client_ExecTaskClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Client_ServiceDesc.Streams[0], Client_ExecTask_FullMethodName, opts...)
+func (c *taskClient) ExecTask(ctx context.Context, in *ExecTaskRequest, opts ...grpc.CallOption) (Task_ExecTaskClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Task_ServiceDesc.Streams[0], Task_ExecTask_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &clientExecTaskClient{stream}
+	x := &taskExecTaskClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -66,16 +66,16 @@ func (c *clientClient) ExecTask(ctx context.Context, in *ExecTaskRequest, opts .
 	return x, nil
 }
 
-type Client_ExecTaskClient interface {
+type Task_ExecTaskClient interface {
 	Recv() (*ExecTaskReply, error)
 	grpc.ClientStream
 }
 
-type clientExecTaskClient struct {
+type taskExecTaskClient struct {
 	grpc.ClientStream
 }
 
-func (x *clientExecTaskClient) Recv() (*ExecTaskReply, error) {
+func (x *taskExecTaskClient) Recv() (*ExecTaskReply, error) {
 	m := new(ExecTaskReply)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -83,128 +83,128 @@ func (x *clientExecTaskClient) Recv() (*ExecTaskReply, error) {
 	return m, nil
 }
 
-func (c *clientClient) CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *taskClient) CancelExecTask(ctx context.Context, in *CancelExecTaskRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Client_CancelExecTask_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Task_CancelExecTask_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ClientServer is the server API for Client service.
-// All implementations must embed UnimplementedClientServer
+// TaskServer is the server API for Task service.
+// All implementations must embed UnimplementedTaskServer
 // for forward compatibility
-type ClientServer interface {
+type TaskServer interface {
 	Healthy(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	ExecTask(*ExecTaskRequest, Client_ExecTaskServer) error
+	ExecTask(*ExecTaskRequest, Task_ExecTaskServer) error
 	CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error)
-	mustEmbedUnimplementedClientServer()
+	mustEmbedUnimplementedTaskServer()
 }
 
-// UnimplementedClientServer must be embedded to have forward compatible implementations.
-type UnimplementedClientServer struct {
+// UnimplementedTaskServer must be embedded to have forward compatible implementations.
+type UnimplementedTaskServer struct {
 }
 
-func (UnimplementedClientServer) Healthy(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (UnimplementedTaskServer) Healthy(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Healthy not implemented")
 }
-func (UnimplementedClientServer) ExecTask(*ExecTaskRequest, Client_ExecTaskServer) error {
+func (UnimplementedTaskServer) ExecTask(*ExecTaskRequest, Task_ExecTaskServer) error {
 	return status.Errorf(codes.Unimplemented, "method ExecTask not implemented")
 }
-func (UnimplementedClientServer) CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error) {
+func (UnimplementedTaskServer) CancelExecTask(context.Context, *CancelExecTaskRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelExecTask not implemented")
 }
-func (UnimplementedClientServer) mustEmbedUnimplementedClientServer() {}
+func (UnimplementedTaskServer) mustEmbedUnimplementedTaskServer() {}
 
-// UnsafeClientServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ClientServer will
+// UnsafeTaskServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TaskServer will
 // result in compilation errors.
-type UnsafeClientServer interface {
-	mustEmbedUnimplementedClientServer()
+type UnsafeTaskServer interface {
+	mustEmbedUnimplementedTaskServer()
 }
 
-func RegisterClientServer(s grpc.ServiceRegistrar, srv ClientServer) {
-	s.RegisterService(&Client_ServiceDesc, srv)
+func RegisterTaskServer(s grpc.ServiceRegistrar, srv TaskServer) {
+	s.RegisterService(&Task_ServiceDesc, srv)
 }
 
-func _Client_Healthy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Task_Healthy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClientServer).Healthy(ctx, in)
+		return srv.(TaskServer).Healthy(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Client_Healthy_FullMethodName,
+		FullMethod: Task_Healthy_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientServer).Healthy(ctx, req.(*emptypb.Empty))
+		return srv.(TaskServer).Healthy(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Client_ExecTask_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _Task_ExecTask_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ExecTaskRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ClientServer).ExecTask(m, &clientExecTaskServer{stream})
+	return srv.(TaskServer).ExecTask(m, &taskExecTaskServer{stream})
 }
 
-type Client_ExecTaskServer interface {
+type Task_ExecTaskServer interface {
 	Send(*ExecTaskReply) error
 	grpc.ServerStream
 }
 
-type clientExecTaskServer struct {
+type taskExecTaskServer struct {
 	grpc.ServerStream
 }
 
-func (x *clientExecTaskServer) Send(m *ExecTaskReply) error {
+func (x *taskExecTaskServer) Send(m *ExecTaskReply) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Client_CancelExecTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Task_CancelExecTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CancelExecTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClientServer).CancelExecTask(ctx, in)
+		return srv.(TaskServer).CancelExecTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Client_CancelExecTask_FullMethodName,
+		FullMethod: Task_CancelExecTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientServer).CancelExecTask(ctx, req.(*CancelExecTaskRequest))
+		return srv.(TaskServer).CancelExecTask(ctx, req.(*CancelExecTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Client_ServiceDesc is the grpc.ServiceDesc for Client service.
+// Task_ServiceDesc is the grpc.ServiceDesc for Task service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Client_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "cron.api.cron.client.v1.Client",
-	HandlerType: (*ClientServer)(nil),
+var Task_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "cron.api.cron.client.v1.Task",
+	HandlerType: (*TaskServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Healthy",
-			Handler:    _Client_Healthy_Handler,
+			Handler:    _Task_Healthy_Handler,
 		},
 		{
 			MethodName: "CancelExecTask",
-			Handler:    _Client_CancelExecTask_Handler,
+			Handler:    _Task_CancelExecTask_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "ExecTask",
-			Handler:       _Client_ExecTask_Handler,
+			Handler:       _Task_ExecTask_Handler,
 			ServerStreams: true,
 		},
 	},

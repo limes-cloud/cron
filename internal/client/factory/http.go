@@ -10,7 +10,7 @@ import (
 	"github.com/limes-cloud/kratosx/config"
 	"github.com/limes-cloud/kratosx/library/http"
 
-	"github.com/limes-cloud/cron/internal/client/biz"
+	"github.com/limes-cloud/cron/internal/client/service"
 )
 
 type HttpRequest struct {
@@ -22,7 +22,7 @@ type HttpRequest struct {
 	BodyJson map[string]any    `json:"bodyJson"`
 }
 
-func (f *Factory) http(ctx kratosx.Context, task *biz.Task) (int, error) {
+func (f *Factory) http(ctx kratosx.Context, task *service.ExecTaskRequest) (int, error) {
 	var (
 		data HttpRequest
 		code = defaultErrorCode
@@ -50,7 +50,7 @@ func (f *Factory) http(ctx kratosx.Context, task *biz.Task) (int, error) {
 		Timeout:          60 * time.Second,
 	}, ctx.Logger())
 
-	response, err := request.Option(func(req *resty.Request) *resty.Request {
+	response, err := request.Option(func(req *resty.Request) {
 		req.URL = data.URL
 		req.Method = data.Method
 		for key, val := range data.Header {
@@ -60,7 +60,6 @@ func (f *Factory) http(ctx kratosx.Context, task *biz.Task) (int, error) {
 			req.QueryParam.Set(key, fmt.Sprint(val))
 		}
 		req.Body = body
-		return req
 	}).Do()
 
 	if err != nil {

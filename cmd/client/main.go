@@ -13,14 +13,13 @@ import (
 	"github.com/limes-cloud/kratosx/config"
 	_ "go.uber.org/automaxprocs"
 
-	v1 "github.com/limes-cloud/cron/api/cron/client/v1"
+	"github.com/limes-cloud/cron/internal/client/app"
 	"github.com/limes-cloud/cron/internal/client/conf"
-	"github.com/limes-cloud/cron/internal/client/service"
 )
 
 func main() {
 	path := flag.String("conf", "internal/client/conf/conf.yaml", "config path, eg: -conf config.yaml")
-	app := kratosx.New(
+	server := kratosx.New(
 		kratosx.Config(file.NewSource(*path)),
 		kratosx.RegistrarServer(RegisterServer),
 		kratosx.Options(kratos.BeforeStop(func(ctx context.Context) error {
@@ -28,7 +27,7 @@ func main() {
 		})),
 	)
 
-	if err := app.Run(); err != nil {
+	if err := server.Run(); err != nil {
 		log.Fatal(err.Error())
 	}
 }
@@ -43,6 +42,5 @@ func RegisterServer(c config.Config, hs *http.Server, gs *grpc.Server) {
 		}
 	})
 
-	srv := service.New(cfg)
-	v1.RegisterClientServer(gs, srv)
+	app.New(cfg, hs, gs)
 }

@@ -57,19 +57,15 @@ func (m *GetTaskRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.Id != nil {
-
-		if m.GetId() <= 0 {
-			err := GetTaskRequestValidationError{
-				field:  "Id",
-				reason: "value must be greater than 0",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+	if m.GetId() <= 0 {
+		err := GetTaskRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
 		}
-
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -438,36 +434,6 @@ func (m *ListTaskRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.Order != nil {
-
-		if _, ok := _ListTaskRequest_Order_InLookup[m.GetOrder()]; !ok {
-			err := ListTaskRequestValidationError{
-				field:  "Order",
-				reason: "value must be in list [asc desc]",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	if m.OrderBy != nil {
-
-		if _, ok := _ListTaskRequest_OrderBy_InLookup[m.GetOrderBy()]; !ok {
-			err := ListTaskRequestValidationError{
-				field:  "OrderBy",
-				reason: "value must be in list [id created_at updated_at]",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
 	if m.GroupId != nil {
 		// no validation rules for GroupId
 	}
@@ -561,17 +527,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListTaskRequestValidationError{}
-
-var _ListTaskRequest_Order_InLookup = map[string]struct{}{
-	"asc":  {},
-	"desc": {},
-}
-
-var _ListTaskRequest_OrderBy_InLookup = map[string]struct{}{
-	"id":         {},
-	"created_at": {},
-	"updated_at": {},
-}
 
 // Validate checks the field values on ListTaskReply with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

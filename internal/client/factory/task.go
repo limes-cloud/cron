@@ -10,15 +10,15 @@ import (
 
 	"github.com/limes-cloud/kratosx"
 
-	"github.com/limes-cloud/cron/internal/client/biz"
 	"github.com/limes-cloud/cron/internal/client/conf"
+	"github.com/limes-cloud/cron/internal/client/service"
 )
 
 type watcher struct {
 	cancel context.CancelFunc
 	mutex  sync.RWMutex
-	buf    []*biz.ExecTaskReply
-	reply  biz.ExecTaskReplyFunc
+	buf    []*service.ExecTaskReply
+	reply  service.ExecTaskReplyFunc
 	closer chan error
 	close  atomic.Bool
 	time   time.Time
@@ -67,7 +67,7 @@ func (f *Factory) CancelExecTask(uuid string) {
 	}
 }
 
-func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskReplyFunc) error {
+func (f *Factory) ExecTask(ctx kratosx.Context, task *service.ExecTaskRequest, fn service.ExecTaskReplyFunc) error {
 	defer func() {
 		f.mutex.Lock()
 		if f.ws[task.Uuid] != nil && f.ws[task.Uuid].close.Load() && len(f.ws[task.Uuid].buf) == 0 {
@@ -110,7 +110,7 @@ func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskR
 			itr.mutex.Unlock()
 		}(&i)
 
-		var tmp = make([]*biz.ExecTaskReply, len(wtr.buf))
+		var tmp = make([]*service.ExecTaskReply, len(wtr.buf))
 		copy(tmp, wtr.buf)
 
 		for ; i < len(tmp); i++ {
@@ -127,7 +127,7 @@ func (f *Factory) ExecTask(ctx kratosx.Context, task *biz.Task, fn biz.ExecTaskR
 
 	closer := make(chan error, 1)
 	wtr := &watcher{
-		buf:    make([]*biz.ExecTaskReply, 0),
+		buf:    make([]*service.ExecTaskReply, 0),
 		reply:  fn,
 		closer: closer,
 		close:  atomic.Bool{},
@@ -147,7 +147,7 @@ func (f *Factory) reply(uuid string, tp string, text string) {
 	wtr := f.ws[uuid]
 	f.mutex.RUnlock()
 
-	res := &biz.ExecTaskReply{
+	res := &service.ExecTaskReply{
 		Type:    tp,
 		Content: text,
 		Time:    uint32(time.Now().Unix()),
@@ -159,7 +159,7 @@ func (f *Factory) reply(uuid string, tp string, text string) {
 	}
 }
 
-func (f *Factory) exec(ctx kratosx.Context, task *biz.Task, wtr *watcher) {
+func (f *Factory) exec(ctx kratosx.Context, task *service.ExecTaskRequest, wtr *watcher) {
 	var (
 		err   error
 		code  = defaultErrorCode

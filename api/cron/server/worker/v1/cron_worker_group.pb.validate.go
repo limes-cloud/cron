@@ -57,19 +57,15 @@ func (m *GetWorkerGroupRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.Id != nil {
-
-		if m.GetId() <= 0 {
-			err := GetWorkerGroupRequestValidationError{
-				field:  "Id",
-				reason: "value must be greater than 0",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+	if m.GetId() < 1 {
+		err := GetWorkerGroupRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than or equal to 1",
 		}
-
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -310,36 +306,6 @@ func (m *ListWorkerGroupRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.Order != nil {
-
-		if _, ok := _ListWorkerGroupRequest_Order_InLookup[m.GetOrder()]; !ok {
-			err := ListWorkerGroupRequestValidationError{
-				field:  "Order",
-				reason: "value must be in list [asc desc]",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	if m.OrderBy != nil {
-
-		if _, ok := _ListWorkerGroupRequest_OrderBy_InLookup[m.GetOrderBy()]; !ok {
-			err := ListWorkerGroupRequestValidationError{
-				field:  "OrderBy",
-				reason: "value must be in list [id created_at updated_at]",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
 	if m.Name != nil {
 		// no validation rules for Name
 	}
@@ -423,17 +389,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListWorkerGroupRequestValidationError{}
-
-var _ListWorkerGroupRequest_Order_InLookup = map[string]struct{}{
-	"asc":  {},
-	"desc": {},
-}
-
-var _ListWorkerGroupRequest_OrderBy_InLookup = map[string]struct{}{
-	"id":         {},
-	"created_at": {},
-	"updated_at": {},
-}
 
 // Validate checks the field values on ListWorkerGroupReply with the rules
 // defined in the proto definition for this message. If any rules are

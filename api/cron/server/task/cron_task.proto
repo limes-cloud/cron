@@ -10,7 +10,7 @@ option java_outer_classname = "TaskV1";
 import "validate/validate.proto";
 
 message GetTaskRequest {
-  optional uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
+  uint32 id = 1[(validate.rules).uint32 = {gt: 0}];
 }
 
 message GetTaskReply {
@@ -52,8 +52,6 @@ message GetTaskReply {
 message ListTaskRequest {
   uint32 page = 1[(validate.rules).uint32 = {gt: 0}];
   uint32 pageSize = 2[(validate.rules).uint32 = {gt: 0,lte:50}];
-  optional string order = 3[(validate.rules).string = {in: ["asc","desc"]}];
-  optional string orderBy = 4[(validate.rules).string = {in: ["id","created_at","updated_at"]}];
   optional uint32 groupId = 5;
   optional string name = 6;
   optional string tag = 7;

@@ -193,6 +193,10 @@ func (m *GetWorkerReply) validate(all bool) error {
 
 	// no validation rules for Ip
 
+	// no validation rules for Ak
+
+	// no validation rules for Sk
+
 	// no validation rules for CreatedAt
 
 	// no validation rules for UpdatedAt
@@ -331,36 +335,6 @@ func (m *ListWorkerRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.Order != nil {
-
-		if _, ok := _ListWorkerRequest_Order_InLookup[m.GetOrder()]; !ok {
-			err := ListWorkerRequestValidationError{
-				field:  "Order",
-				reason: "value must be in list [asc desc]",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	if m.OrderBy != nil {
-
-		if _, ok := _ListWorkerRequest_OrderBy_InLookup[m.GetOrderBy()]; !ok {
-			err := ListWorkerRequestValidationError{
-				field:  "OrderBy",
-				reason: "value must be in list [id created_at updated_at]",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
 	if m.Name != nil {
 		// no validation rules for Name
 	}
@@ -456,17 +430,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListWorkerRequestValidationError{}
-
-var _ListWorkerRequest_Order_InLookup = map[string]struct{}{
-	"asc":  {},
-	"desc": {},
-}
-
-var _ListWorkerRequest_OrderBy_InLookup = map[string]struct{}{
-	"id":         {},
-	"created_at": {},
-	"updated_at": {},
-}
 
 // Validate checks the field values on ListWorkerReply with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -640,6 +603,28 @@ func (m *CreateWorkerRequest) validate(all bool) error {
 	if utf8.RuneCountInString(m.GetIp()) < 1 {
 		err := CreateWorkerRequestValidationError{
 			field:  "Ip",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetAk()) < 1 {
+		err := CreateWorkerRequestValidationError{
+			field:  "Ak",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetSk()) < 1 {
+		err := CreateWorkerRequestValidationError{
+			field:  "Sk",
 			reason: "value length must be at least 1 runes",
 		}
 		if !all {
@@ -902,6 +887,28 @@ func (m *UpdateWorkerRequest) validate(all bool) error {
 	if utf8.RuneCountInString(m.GetIp()) < 1 {
 		err := UpdateWorkerRequestValidationError{
 			field:  "Ip",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetAk()) < 1 {
+		err := UpdateWorkerRequestValidationError{
+			field:  "Ak",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetSk()) < 1 {
+		err := UpdateWorkerRequestValidationError{
+			field:  "Sk",
 			reason: "value length must be at least 1 runes",
 		}
 		if !all {
@@ -1674,6 +1681,10 @@ func (m *ListWorkerReply_Worker) validate(all bool) error {
 	// no validation rules for Name
 
 	// no validation rules for Ip
+
+	// no validation rules for Ak
+
+	// no validation rules for Sk
 
 	// no validation rules for CreatedAt
 

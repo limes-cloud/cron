@@ -19,13 +19,10 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationLogDeleteLog = "/cron.api.server.cron.log.v1.Log/DeleteLog"
 const OperationLogGetLog = "/cron.api.server.cron.log.v1.Log/GetLog"
 const OperationLogListLog = "/cron.api.server.cron.log.v1.Log/ListLog"
 
 type LogHTTPServer interface {
-	// DeleteLog DeleteLog 删除日志信息
-	DeleteLog(context.Context, *DeleteLogRequest) (*DeleteLogReply, error)
 	// GetLog GetLog 获取指定的日志信息
 	GetLog(context.Context, *GetLogRequest) (*GetLogReply, error)
 	// ListLog ListLog 获取日志信息列表
@@ -36,7 +33,6 @@ func RegisterLogHTTPServer(s *http.Server, srv LogHTTPServer) {
 	r := s.Route("/")
 	r.GET("/cron/api/v1/log", _Log_GetLog0_HTTP_Handler(srv))
 	r.GET("/cron/api/v1/logs", _Log_ListLog0_HTTP_Handler(srv))
-	r.DELETE("/cron/api/v1/log", _Log_DeleteLog0_HTTP_Handler(srv))
 }
 
 func _Log_GetLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error {
@@ -77,27 +73,7 @@ func _Log_ListLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error 
 	}
 }
 
-func _Log_DeleteLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in DeleteLogRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationLogDeleteLog)
-		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
-			return srv.DeleteLog(ctx, req.(*DeleteLogRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*DeleteLogReply)
-		return ctx.Result(200, reply)
-	}
-}
-
 type LogHTTPClient interface {
-	DeleteLog(ctx context.Context, req *DeleteLogRequest, opts ...http.CallOption) (rsp *DeleteLogReply, err error)
 	GetLog(ctx context.Context, req *GetLogRequest, opts ...http.CallOption) (rsp *GetLogReply, err error)
 	ListLog(ctx context.Context, req *ListLogRequest, opts ...http.CallOption) (rsp *ListLogReply, err error)
 }
@@ -108,19 +84,6 @@ type LogHTTPClientImpl struct {
 
 func NewLogHTTPClient(client *http.Client) LogHTTPClient {
 	return &LogHTTPClientImpl{client}
-}
-
-func (c *LogHTTPClientImpl) DeleteLog(ctx context.Context, in *DeleteLogRequest, opts ...http.CallOption) (*DeleteLogReply, error) {
-	var out DeleteLogReply
-	pattern := "/cron/api/v1/log"
-	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationLogDeleteLog))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, err
 }
 
 func (c *LogHTTPClientImpl) GetLog(ctx context.Context, in *GetLogRequest, opts ...http.CallOption) (*GetLogReply, error) {

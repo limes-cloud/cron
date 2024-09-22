@@ -8,10 +8,10 @@ import (
 
 	"github.com/limes-cloud/kratosx"
 
-	"github.com/limes-cloud/cron/internal/client/biz"
+	"github.com/limes-cloud/cron/internal/client/service"
 )
 
-func (f *Factory) shell(ctx kratosx.Context, task *biz.Task) (int, error) {
+func (f *Factory) shell(ctx kratosx.Context, task *service.ExecTaskRequest) (int, error) {
 	shell := f.conf.Shell
 	if shell == "" {
 		shell = defaultShell

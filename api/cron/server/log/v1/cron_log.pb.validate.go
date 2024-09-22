@@ -57,19 +57,15 @@ func (m *GetLogRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.Id != nil {
-
-		if m.GetId() <= 0 {
-			err := GetLogRequestValidationError{
-				field:  "Id",
-				reason: "value must be greater than 0",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
+	if m.GetId() < 1 {
+		err := GetLogRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than or equal to 1",
 		}
-
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {

@@ -7,7 +7,7 @@ import (
 
 	json "github.com/json-iterator/go"
 
-	"github.com/limes-cloud/cron/internal/client/biz"
+	"github.com/limes-cloud/cron/internal/client/service"
 )
 
 type store struct {
@@ -25,8 +25,8 @@ func (s *scanner) Scan() bool {
 	return s.scanner.Scan()
 }
 
-func (s *scanner) Data() (*biz.ExecTaskReply, error) {
-	res := biz.ExecTaskReply{}
+func (s *scanner) Data() (*service.ExecTaskReply, error) {
+	res := service.ExecTaskReply{}
 	if err := json.Unmarshal(s.scanner.Bytes(), &res); err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (s *store) filename(uuid string) string {
 	return fmt.Sprintf(filePrefix, uuid)
 }
 
-func (s *store) add(uuid string, data *biz.ExecTaskReply) error {
+func (s *store) add(uuid string, data *service.ExecTaskReply) error {
 	file, err := os.OpenFile(s.filename(uuid), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err

@@ -26,11 +26,4 @@ service Log{
     };
   }
 
-  // DeleteLog 删除日志信息
-  rpc DeleteLog (DeleteLogRequest) returns (DeleteLogReply) {
-    option (google.api.http) = {
-      delete: "/cron/api/v1/log",
-    };
-  }
-
 }

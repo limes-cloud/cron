@@ -5,6 +5,11 @@ server:
     host: 0.0.0.0
     port: 8121
     timeout: 10s
+signature:
+  enable: true
+  ak: client
+  sk: 12345678
+  expire: 10s
 log:
   level: 0 #日志输出等级
   caller: true
