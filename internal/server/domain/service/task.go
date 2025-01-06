@@ -5,10 +5,10 @@ import (
 	"io"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/limes-cloud/kratosx"
 	"github.com/limes-cloud/kratosx/pkg/crypto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/limes-cloud/cron/api/cron/errors"
 	"github.com/limes-cloud/cron/internal/server/conf"

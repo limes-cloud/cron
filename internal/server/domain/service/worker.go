@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/limes-cloud/kratosx"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/limes-cloud/cron/api/cron/errors"
 	"github.com/limes-cloud/cron/internal/server/conf"

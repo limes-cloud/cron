@@ -170,7 +170,8 @@ func (f *Factory) exec(ctx kratosx.Context, task *service.ExecTaskRequest, wtr *
 		f.reply(task.Uuid, logInfo, fmt.Sprintf(startInfo, i+1, task.Uuid))
 		childCtx := ctx
 		if task.MaxExecTime != 0 {
-			c, _ := context.WithTimeout(ctx, time.Duration(task.MaxExecTime)*time.Second)
+			c, cancel := context.WithTimeout(ctx, time.Duration(task.MaxExecTime)*time.Second)
+			defer cancel()
 			childCtx = kratosx.MustContext(c)
 		}
 

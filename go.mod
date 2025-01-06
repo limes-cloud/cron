@@ -7,7 +7,6 @@ require (
 	github.com/go-kratos/kratos/v2 v2.7.3
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.12.0
-	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/limes-cloud/configure v1.0.49
