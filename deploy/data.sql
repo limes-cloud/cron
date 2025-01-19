@@ -53,9 +53,6 @@ CREATE TABLE IF NOT EXISTS `task` (
     KEY `worker_id` (`worker_id`)
     ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='任务信息';
 
-INSERT INTO `task` (`id`, `group_id`, `name`, `tag`, `spec`, `worker_type`, `worker_group_id`, `worker_id`, `exec_type`, `exec_value`, `expect_code`, `retry_count`, `retry_wait_time`, `max_exec_time`, `status`, `version`, `description`, `created_at`, `updated_at`) VALUES
-    (3, 2, '测试任务', 'tets', '*/20 * * * * ?', 'worker', NULL, 2, 'http', '{\n    \"url\": \"https://www.baidu.com\",\n    \"params\": {\n        \"q\": 1\n    },\n    \"bodyJson\": {\n        \"params\": \"1\"\n    }\n}', 0, 1, 0, 11, 0, 'ABA12FD3D517908377520AA3C4345FC5', '测试任务', 1713409741, 1719733478);
-
 
 DROP TABLE IF EXISTS `task_group`;
 CREATE TABLE IF NOT EXISTS `task_group` (
