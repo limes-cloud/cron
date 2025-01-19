@@ -153,6 +153,9 @@ func (s *Task) ListTask(c context.Context, req *pb.ListTaskRequest) (*pb.ListTas
 
 // CreateTask 创建任务信息
 func (s *Task) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskReply, error) {
+	if (req.Start != nil || req.End != nil) && (req.Start == nil || req.End == nil) {
+		return nil, errors.ParamsError()
+	}
 	id, err := s.srv.CreateTask(kratosx.MustContext(c), &entity.Task{
 		GroupId:       req.GroupId,
 		Name:          req.Name,
@@ -169,6 +172,8 @@ func (s *Task) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.Cre
 		RetryWaitTime: req.RetryWaitTime,
 		MaxExecTime:   req.MaxExecTime,
 		Description:   req.Description,
+		Start:         req.Start,
+		End:           req.End,
 	})
 	if err != nil {
 		return nil, err
@@ -178,6 +183,9 @@ func (s *Task) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.Cre
 
 // UpdateTask 更新任务信息
 func (s *Task) UpdateTask(c context.Context, req *pb.UpdateTaskRequest) (*pb.UpdateTaskReply, error) {
+	if (req.Start != nil || req.End != nil) && (req.Start == nil || req.End == nil) {
+		return nil, errors.ParamsError()
+	}
 	if err := s.srv.UpdateTask(kratosx.MustContext(c), &entity.Task{
 		BaseModel:     ktypes.BaseModel{Id: req.Id},
 		GroupId:       req.GroupId,
@@ -194,6 +202,8 @@ func (s *Task) UpdateTask(c context.Context, req *pb.UpdateTaskRequest) (*pb.Upd
 		RetryWaitTime: req.RetryWaitTime,
 		MaxExecTime:   req.MaxExecTime,
 		Description:   req.Description,
+		Start:         req.Start,
+		End:           req.End,
 	}); err != nil {
 		return nil, err
 	}

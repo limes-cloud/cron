@@ -214,6 +214,14 @@ func (m *GetTaskReply) validate(all bool) error {
 		// no validation rules for Description
 	}
 
+	if m.Start != nil {
+		// no validation rules for Start
+	}
+
+	if m.End != nil {
+		// no validation rules for End
+	}
+
 	if m.Group != nil {
 
 		if all {
@@ -809,6 +817,14 @@ func (m *CreateTaskRequest) validate(all bool) error {
 		// no validation rules for Description
 	}
 
+	if m.Start != nil {
+		// no validation rules for Start
+	}
+
+	if m.End != nil {
+		// no validation rules for End
+	}
+
 	if len(errors) > 0 {
 		return CreateTaskRequestMultiError(errors)
 	}
@@ -1141,6 +1157,14 @@ func (m *UpdateTaskRequest) validate(all bool) error {
 
 	if m.Description != nil {
 		// no validation rules for Description
+	}
+
+	if m.Start != nil {
+		// no validation rules for Start
+	}
+
+	if m.End != nil {
+		// no validation rules for End
 	}
 
 	if len(errors) > 0 {
@@ -2553,6 +2577,14 @@ func (m *ListTaskReply_Task) validate(all bool) error {
 
 	if m.Description != nil {
 		// no validation rules for Description
+	}
+
+	if m.Start != nil {
+		// no validation rules for Start
+	}
+
+	if m.End != nil {
+		// no validation rules for End
 	}
 
 	if len(errors) > 0 {

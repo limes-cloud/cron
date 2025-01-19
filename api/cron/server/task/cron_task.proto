@@ -42,6 +42,8 @@ message GetTaskReply {
   uint32 maxExecTime = 15;
   string version = 16;
   optional string description = 17;
+  optional uint32 start = 23;
+  optional uint32 end = 24;
   uint32 createdAt = 18;
   uint32 updatedAt = 19;
   optional Group group = 20;
@@ -77,6 +79,8 @@ message ListTaskReply {
     uint32 maxExecTime = 15;
     string version = 16;
     optional string description = 17;
+    optional uint32 start = 20;
+    optional uint32 end = 21;
     uint32 createdAt = 18;
     uint32 updatedAt = 19;
 
@@ -102,6 +106,8 @@ message CreateTaskRequest {
   uint32 retryWaitTime = 13;
   uint32 maxExecTime = 14;
   optional string description = 15;
+  optional uint32 start = 16;
+  optional uint32 end = 17;
 }
 
 message CreateTaskReply {
@@ -124,6 +130,8 @@ message UpdateTaskRequest {
   uint32 retryWaitTime = 13;
   uint32 maxExecTime = 14;
   optional string description = 15;
+  optional uint32 start = 16;
+  optional uint32 end = 17;
 }
 
 message UpdateTaskReply {

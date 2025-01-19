@@ -182,7 +182,12 @@ func (t *Task) AllTaskSpecs(ctx kratosx.Context) map[uint32]string {
 		list []*entity.Task
 		m    = map[uint32]string{}
 	)
-	ctx.DB().Model(entity.Task{}).Where("status=true").Find(&list)
+	ctx.DB().Model(entity.Task{}).
+		Where("status=true").
+		// 提前加载需要启动的定时任务 -2*repairSleep 防止存在加载空隙2️而没被触发
+		Where("start is null or start <= ?", time.Now().Unix()-2*repairSleep).
+		Where("end is null or end <= ?", time.Now().Unix()).
+		Find(&list)
 	for _, item := range list {
 		m[item.Id] = item.Spec
 	}

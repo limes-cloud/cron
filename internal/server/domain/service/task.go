@@ -140,11 +140,11 @@ func (t *Task) CreateTask(ctx kratosx.Context, task *entity.Task) (uint32, error
 
 // UpdateTask 更新任务信息
 func (t *Task) UpdateTask(ctx kratosx.Context, task *entity.Task) error {
-	task, err := t.repo.GetTask(ctx, task.Id)
+	oldTask, err := t.repo.GetTask(ctx, task.Id)
 	if err != nil {
 		return errors.GetError(err.Error())
 	}
-	if task.Status != nil && *task.Status {
+	if oldTask.Status != nil && *oldTask.Status {
 		return errors.UpdateNotDisableTaskError()
 	}
 

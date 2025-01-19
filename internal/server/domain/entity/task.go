@@ -25,6 +25,8 @@ type Task struct {
 	MaxExecTime   uint32       `json:"maxExecTime" gorm:"column:max_exec_time"`
 	Version       string       `json:"version" gorm:"column:version"`
 	Description   *string      `json:"description" gorm:"column:description"`
+	Start         *uint32      `json:"start" gorm:"column:start"`
+	End           *uint32      `json:"end" gorm:"column:end"`
 	Group         *TaskGroup   `json:"group"`
 	Worker        *Worker      `json:"worker"`
 	WorkerGroup   *WorkerGroup `json:"workerGroup"`

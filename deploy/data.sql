@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS `task` (
     `status` tinyint(1) NOT NULL COMMENT '状态',
     `version` varchar(64) NOT NULL COMMENT '版本',
     `description` varchar(256) NOT NULL COMMENT '描述',
+    `start` bigint DEFAULT NULL COMMENT '开始时间',
+    `end` bigint DEFAULT NULL COMMENT '结束时间',
     `created_at` bigint(20) DEFAULT NULL COMMENT '创建时间',
     `updated_at` bigint(20) DEFAULT NULL COMMENT '修改时间',
     PRIMARY KEY (`id`),
