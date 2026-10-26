@@ -5,12 +5,12 @@ go 1.24.6
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.2.1
 	github.com/go-kratos/kratos/v2 v2.8.4
-	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/limes-cloud/configure v1.0.49
-	github.com/limes-cloud/kratosx v1.2.9
+	github.com/limes-cloud/kratosx v1.3.3
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/robfig/cron/v3 v3.0.0
 	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c
@@ -25,8 +25,6 @@ require (
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
 	github.com/miekg/dns v1.1.43 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/onsi/gomega v1.24.2 // indirect
-	github.com/redis/go-redis/v9 v9.7.3 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
@@ -117,7 +115,5 @@ require (
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/driver/sqlserver v1.6.1 // indirect
 )
-
-replace github.com/limes-cloud/kratosx => ../../framework/kratosx
 
 replace github.com/limes-cloud/manager/api => ../manager/api
