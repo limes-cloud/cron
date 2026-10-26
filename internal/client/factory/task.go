@@ -29,6 +29,7 @@ type Factory struct {
 	conf  *conf.Config
 	ws    map[string]*watcher
 	mutex sync.RWMutex
+	store *store // 执行日志落盘（.db/{uuid}，client 重启后仍可审计）
 }
 
 var (
@@ -53,6 +54,7 @@ func New(conf *conf.Config) *Factory {
 			conf:  conf,
 			ws:    make(map[string]*watcher),
 			mutex: sync.RWMutex{},
+			store: &store{},
 		}
 	})
 	return _f
@@ -152,6 +154,9 @@ func (f *Factory) reply(uuid string, tp string, text string) {
 		Content: text,
 		Time:    uint32(time.Now().Unix()),
 	}
+	// 全量落盘（.db/{uuid}）：client 重启后日志仍可审计；落盘失败不影响执行
+	_ = f.store.add(uuid, res)
+
 	wtr.mutex.Lock()
 	defer wtr.mutex.Unlock()
 	if err := wtr.reply(res); err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/limes-cloud/cron/internal/server/types"
 )
 
+// Task 任务仓储接口（纯数据访问；调度方法已移入 scheduler 组件）
 type Task interface {
 	// GetTaskGroup 获取指定的任务分组
 	GetTaskGroup(ctx kratosx.Context, id uint32) (*entity.TaskGroup, error)
@@ -41,24 +42,6 @@ type Task interface {
 	// DeleteTask 删除任务信息
 	DeleteTask(ctx kratosx.Context, id uint32) error
 
-	// AllTaskSpecs 获取所有的表达式
+	// AllTaskSpecs 获取当前启用且生效窗口内的任务表达式（scheduler 启动加载/对账用）
 	AllTaskSpecs(ctx kratosx.Context) map[uint32]string
-
-	// StartCron 启动定时任务
-	StartCron(scheduler func(ctx kratosx.Context, id uint32, spec string, force bool) error)
-
-	// ValidateSpec 验证定时任务表达式
-	ValidateSpec(s string) error
-
-	// AddCron 添加定时任务
-	AddCron(id uint32, spec string) error
-
-	// RemoveCron 删除定时任务
-	RemoveCron(id uint32) error
-
-	// UpdateCron 更新定时任务
-	UpdateCron(id uint32, spec string) error
-
-	// CloseCron 优雅关闭停止定时任务
-	CloseCron()
 }

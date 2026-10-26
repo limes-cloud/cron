@@ -26,4 +26,11 @@ service Log{
     };
   }
 
+  // ListExecution 获取执行历史列表
+  rpc ListExecution (ListExecutionRequest) returns (ListExecutionReply) {
+    option (google.api.http) = {
+      get: "/cron/api/v1/executions",
+    };
+  }
+
 }

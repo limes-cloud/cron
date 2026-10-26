@@ -2,20 +2,23 @@ package app
 
 import (
 	"context"
+	"fmt"
+	"os"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/limes-cloud/kratosx"
-	"github.com/limes-cloud/kratosx/pkg/valx"
-	ktypes "github.com/limes-cloud/kratosx/types"
+	"github.com/limes-cloud/kratosx/pkg/value"
+	ktypes "github.com/limes-cloud/kratosx/model"
 
 	"github.com/limes-cloud/cron/api/cron/errors"
 	pb "github.com/limes-cloud/cron/api/cron/server/task/v1"
-	"github.com/limes-cloud/cron/internal/server/conf"
 	"github.com/limes-cloud/cron/internal/server/domain/entity"
 	"github.com/limes-cloud/cron/internal/server/domain/service"
 	"github.com/limes-cloud/cron/internal/server/infra/dbs"
 	"github.com/limes-cloud/cron/internal/server/infra/rpc"
+	"github.com/limes-cloud/cron/internal/server/scheduler"
 	"github.com/limes-cloud/cron/internal/server/types"
 )
 
@@ -24,21 +27,36 @@ type Task struct {
 	srv *service.Task
 }
 
-func NewTask(conf *conf.Config) *Task {
+// NewTask 组装任务服务；调度器由 Leader 选举接管（仅 leader 实例运行，故障 ≤10s 接管）
+func NewTask() *Task {
+	ctx := kratosx.MustContext(context.Background())
+	hostname, _ := os.Hostname()
+	sched := scheduler.Init(&scheduler.Config{
+		TaskRepo:   dbs.NewTask(),
+		WorkerRepo: dbs.NewWorker(),
+		LogRepo:    dbs.NewLog(),
+		ExecRepo:   dbs.NewExecution(),
+		TaskClient: rpc.NewTaskClient(),
+		Lock:       scheduler.NewRedisLock(ctx.Redis()),
+		Trigger:    scheduler.NewCronTrigger(log.NewHelper(ctx.Logger())),
+		Logger:     log.NewHelper(ctx.Logger()),
+		InstanceID: fmt.Sprintf("%s:%d", hostname, os.Getpid()),
+	})
+	// Leader 选举：成为 leader 时启动调度器，失去时停止（可重复启停）
+	leader := scheduler.NewLeader(scheduler.NewRedisLeaderStore(ctx.Redis()), sched.InstanceID())
+	go leader.Run(context.Background(), sched.Start, sched.Stop)
 	return &Task{
 		srv: service.NewTask(
-			conf,
 			dbs.NewTask(),
-			dbs.NewWorker(),
 			dbs.NewLog(),
-			rpc.NewTaskClient(),
+			sched,
 		),
 	}
 }
 
 func init() {
-	register(func(c *conf.Config, hs *http.Server, gs *grpc.Server) {
-		srv := NewTask(c)
+	register(func(hs *http.Server, gs *grpc.Server) {
+		srv := NewTask()
 		pb.RegisterTaskServer(gs, srv)
 		pb.RegisterTaskHTTPServer(hs, srv)
 	})
@@ -46,7 +64,12 @@ func init() {
 
 // GetTaskGroup 获取指定的任务分组
 func (s *Task) GetTaskGroup(c context.Context, req *pb.GetTaskGroupRequest) (*pb.GetTaskGroupReply, error) {
-	result, err := s.srv.GetTaskGroup(kratosx.MustContext(c), req.Id)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.srv.GetTaskGroup(kratosx.MustContext(c), app, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +84,13 @@ func (s *Task) GetTaskGroup(c context.Context, req *pb.GetTaskGroupRequest) (*pb
 
 // ListTaskGroup 获取任务分组列表
 func (s *Task) ListTaskGroup(c context.Context, req *pb.ListTaskGroupRequest) (*pb.ListTaskGroupReply, error) {
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
 	list, total, err := s.srv.ListTaskGroup(kratosx.MustContext(c), &types.ListTaskGroupRequest{
+		App:  app,
 		Page:     req.Page,
 		PageSize: req.PageSize,
 		Order:    req.Order,
@@ -86,7 +115,13 @@ func (s *Task) ListTaskGroup(c context.Context, req *pb.ListTaskGroupRequest) (*
 
 // CreateTaskGroup 创建任务分组
 func (s *Task) CreateTaskGroup(c context.Context, req *pb.CreateTaskGroupRequest) (*pb.CreateTaskGroupReply, error) {
-	id, err := s.srv.CreateTaskGroup(kratosx.MustContext(c), &entity.TaskGroup{
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	id, err := s.srv.CreateTaskGroup(kratosx.MustContext(c), app, &entity.TaskGroup{
+		App:          app,
 		Name:        req.Name,
 		Description: req.Description,
 	})
@@ -98,7 +133,13 @@ func (s *Task) CreateTaskGroup(c context.Context, req *pb.CreateTaskGroupRequest
 
 // UpdateTaskGroup 更新任务分组
 func (s *Task) UpdateTaskGroup(c context.Context, req *pb.UpdateTaskGroupRequest) (*pb.UpdateTaskGroupReply, error) {
-	if err := s.srv.UpdateTaskGroup(kratosx.MustContext(c), &entity.TaskGroup{
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.srv.UpdateTaskGroup(kratosx.MustContext(c), app, &entity.TaskGroup{
+		App:          app,
 		BaseModel:   ktypes.BaseModel{Id: req.Id},
 		Name:        req.Name,
 		Description: req.Description,
@@ -110,7 +151,12 @@ func (s *Task) UpdateTaskGroup(c context.Context, req *pb.UpdateTaskGroupRequest
 
 // DeleteTaskGroup 删除任务分组
 func (s *Task) DeleteTaskGroup(c context.Context, req *pb.DeleteTaskGroupRequest) (*pb.DeleteTaskGroupReply, error) {
-	err := s.srv.DeleteTaskGroup(kratosx.MustContext(c), req.Id)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	err = s.srv.DeleteTaskGroup(kratosx.MustContext(c), app, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -119,12 +165,17 @@ func (s *Task) DeleteTaskGroup(c context.Context, req *pb.DeleteTaskGroupRequest
 
 // GetTask 获取指定的任务信息
 func (s *Task) GetTask(c context.Context, req *pb.GetTaskRequest) (*pb.GetTaskReply, error) {
-	result, err := s.srv.GetTask(kratosx.MustContext(c), req.Id)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.srv.GetTask(kratosx.MustContext(c), app, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	reply := pb.GetTaskReply{}
-	if err := valx.Transform(result, &reply); err != nil {
+	if err := value.Transform(result, &reply); err != nil {
 		return nil, errors.TransformError()
 	}
 	return &reply, nil
@@ -132,7 +183,13 @@ func (s *Task) GetTask(c context.Context, req *pb.GetTaskRequest) (*pb.GetTaskRe
 
 // ListTask 获取任务信息列表
 func (s *Task) ListTask(c context.Context, req *pb.ListTaskRequest) (*pb.ListTaskReply, error) {
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
 	result, total, err := s.srv.ListTask(kratosx.MustContext(c), &types.ListTaskRequest{
+		App:  app,
 		Page:     req.Page,
 		PageSize: req.PageSize,
 		GroupId:  req.GroupId,
@@ -145,18 +202,32 @@ func (s *Task) ListTask(c context.Context, req *pb.ListTaskRequest) (*pb.ListTas
 	}
 
 	reply := pb.ListTaskReply{Total: total}
-	if err := valx.Transform(result, &reply.List); err != nil {
+	if err := value.Transform(result, &reply.List); err != nil {
 		return nil, errors.TransformError()
 	}
 	return &reply, nil
 }
 
+// taskStr 解引用可选字符串（proto optional *string → entity string），nil 时用默认值
+func taskStr(v *string, def string) string {
+	if v == nil {
+		return def
+	}
+	return *v
+}
+
 // CreateTask 创建任务信息
 func (s *Task) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskReply, error) {
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
 	if (req.Start != nil || req.End != nil) && (req.Start == nil || req.End == nil) {
 		return nil, errors.ParamsError()
 	}
-	id, err := s.srv.CreateTask(kratosx.MustContext(c), &entity.Task{
+	id, err := s.srv.CreateTask(kratosx.MustContext(c), app, &entity.Task{
+		App:          app,
 		GroupId:       req.GroupId,
 		Name:          req.Name,
 		Tag:           req.Tag,
@@ -174,6 +245,8 @@ func (s *Task) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.Cre
 		Description:   req.Description,
 		Start:         req.Start,
 		End:           req.End,
+		RouteType:     taskStr(req.RouteType, entity.RouteSingle),
+		Misfire:       taskStr(req.Misfire, entity.MisfireLatest),
 	})
 	if err != nil {
 		return nil, err
@@ -183,10 +256,16 @@ func (s *Task) CreateTask(c context.Context, req *pb.CreateTaskRequest) (*pb.Cre
 
 // UpdateTask 更新任务信息
 func (s *Task) UpdateTask(c context.Context, req *pb.UpdateTaskRequest) (*pb.UpdateTaskReply, error) {
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
 	if (req.Start != nil || req.End != nil) && (req.Start == nil || req.End == nil) {
 		return nil, errors.ParamsError()
 	}
-	if err := s.srv.UpdateTask(kratosx.MustContext(c), &entity.Task{
+	if err := s.srv.UpdateTask(kratosx.MustContext(c), app, &entity.Task{
+		App:          app,
 		BaseModel:     ktypes.BaseModel{Id: req.Id},
 		GroupId:       req.GroupId,
 		Name:          req.Name,
@@ -204,6 +283,8 @@ func (s *Task) UpdateTask(c context.Context, req *pb.UpdateTaskRequest) (*pb.Upd
 		Description:   req.Description,
 		Start:         req.Start,
 		End:           req.End,
+		RouteType:     taskStr(req.RouteType, entity.RouteSingle),
+		Misfire:       taskStr(req.Misfire, entity.MisfireLatest),
 	}); err != nil {
 		return nil, err
 	}
@@ -213,12 +294,22 @@ func (s *Task) UpdateTask(c context.Context, req *pb.UpdateTaskRequest) (*pb.Upd
 
 // UpdateTaskStatus 更新任务信息状态
 func (s *Task) UpdateTaskStatus(c context.Context, req *pb.UpdateTaskStatusRequest) (*pb.UpdateTaskStatusReply, error) {
-	return &pb.UpdateTaskStatusReply{}, s.srv.UpdateTaskStatus(kratosx.MustContext(c), req.Id, req.Status)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UpdateTaskStatusReply{}, s.srv.UpdateTaskStatus(kratosx.MustContext(c), app, req.Id, req.Status)
 }
 
 // DeleteTask 删除任务信息
 func (s *Task) DeleteTask(c context.Context, req *pb.DeleteTaskRequest) (*pb.DeleteTaskReply, error) {
-	err := s.srv.DeleteTask(kratosx.MustContext(c), req.Id)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	err = s.srv.DeleteTask(kratosx.MustContext(c), app, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +318,12 @@ func (s *Task) DeleteTask(c context.Context, req *pb.DeleteTaskRequest) (*pb.Del
 
 // ExecTask 执行任务信息
 func (s *Task) ExecTask(c context.Context, req *pb.ExecTaskRequest) (*pb.ExecTaskReply, error) {
-	err := s.srv.ExecTask(kratosx.MustContext(c), req.Id)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	err = s.srv.ExecTask(kratosx.MustContext(c), app, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +332,12 @@ func (s *Task) ExecTask(c context.Context, req *pb.ExecTaskRequest) (*pb.ExecTas
 
 // CancelExecTask 取消任务信息
 func (s *Task) CancelExecTask(c context.Context, req *pb.CancelExecTaskRequest) (*pb.CancelExecTaskReply, error) {
-	err := s.srv.CancelExecTask(kratosx.MustContext(c), req.Uuid)
+
+	app, err := currentApp(c)
+	if err != nil {
+		return nil, err
+	}
+	err = s.srv.CancelExecTask(kratosx.MustContext(c), app, req.Uuid)
 	if err != nil {
 		return nil, err
 	}

@@ -62,7 +62,11 @@ func (l *Log) ListLog(ctx kratosx.Context, req *types.ListLogRequest) ([]*entity
 		fs    = []string{"id", "uuid", "worker_id", "task_id", "start_at", "end_at", "status"}
 	)
 
-	db := ctx.DB().Model(entity.Log{}).Select(fs).Where("task_id=?", req.TaskId)
+	db := ctx.DB().Model(entity.Log{}).Select(fs)
+	if req.App != "" {
+		db = db.Where("app = ?", req.App)
+	}
+	db = db.Where("task_id=?", req.TaskId)
 
 	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -86,10 +90,14 @@ func (l *Log) DeleteLog(ctx kratosx.Context, id uint32) error {
 	return ctx.DB().Where("id = ?", id).Delete(&entity.Log{}).Error
 }
 
-// AppendLogContent 追加指定的uuid的日志内容
+// maxLogContent 执行日志 content 上限（2MB）；超限后不再追加，防单条记录无限膨胀
+const maxLogContent = 2 * 1024 * 1024
+
+// AppendLogContent 追加指定的uuid的日志内容（带长度保护）
 func (l *Log) AppendLogContent(ctx kratosx.Context, uuid string, content string) error {
 	return ctx.DB().Model(&entity.Log{}).
 		Where("uuid=?", uuid).
+		Where("CHAR_LENGTH(content) < ?", maxLogContent).
 		UpdateColumn("content", gorm.Expr("CONCAT(content,?)", ","+content)).Error
 }
 

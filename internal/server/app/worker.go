@@ -6,10 +6,9 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/limes-cloud/kratosx"
-	ktypes "github.com/limes-cloud/kratosx/types"
+	ktypes "github.com/limes-cloud/kratosx/model"
 
 	pb "github.com/limes-cloud/cron/api/cron/server/worker/v1"
-	"github.com/limes-cloud/cron/internal/server/conf"
 	"github.com/limes-cloud/cron/internal/server/domain/entity"
 	"github.com/limes-cloud/cron/internal/server/domain/service"
 	"github.com/limes-cloud/cron/internal/server/infra/dbs"
@@ -22,10 +21,9 @@ type Worker struct {
 	srv *service.Worker
 }
 
-func NewWorker(conf *conf.Config) *Worker {
+func NewWorker() *Worker {
 	return &Worker{
 		srv: service.NewWorker(
-			conf,
 			dbs.NewWorker(),
 			rpc.NewTaskClient(),
 		),
@@ -33,8 +31,8 @@ func NewWorker(conf *conf.Config) *Worker {
 }
 
 func init() {
-	register(func(c *conf.Config, hs *http.Server, gs *grpc.Server) {
-		srv := NewWorker(c)
+	register(func(hs *http.Server, gs *grpc.Server) {
+		srv := NewWorker()
 		pb.RegisterWorkerServer(gs, srv)
 		pb.RegisterWorkerHTTPServer(hs, srv)
 	})
@@ -123,16 +121,20 @@ func (s *Worker) GetWorker(c context.Context, req *pb.GetWorkerRequest) (*pb.Get
 		return nil, err
 	}
 	return &pb.GetWorkerReply{
-		Id:          result.Id,
-		Name:        result.Name,
-		Ip:          result.Ip,
-		Ak:          result.Ak,
-		Sk:          result.Sk,
-		GroupId:     result.GroupId,
-		Status:      result.Status,
-		Description: result.Description,
-		CreatedAt:   uint32(result.CreatedAt),
-		UpdatedAt:   uint32(result.UpdatedAt),
+		Id:            result.Id,
+		Name:          result.Name,
+		Ip:            result.Ip,
+		Ak:            result.Ak,
+		Sk:            result.Sk,
+		GroupId:       result.GroupId,
+		Status:        result.Status,
+		Description:   result.Description,
+		CreatedAt:     uint32(result.CreatedAt),
+		UpdatedAt:     uint32(result.UpdatedAt),
+		Apps:          result.Apps,
+		LastCheckAt:   result.LastCheckAt,
+		LastHeartbeat: result.LastHeartbeat,
+		LastError:     result.LastError,
 	}, nil
 }
 
@@ -152,20 +154,26 @@ func (s *Worker) ListWorker(c context.Context, req *pb.ListWorkerRequest) (*pb.L
 
 	reply := pb.ListWorkerReply{Total: total}
 	for _, item := range list {
+		var group *pb.ListWorkerReply_Group
+		if item.Group != nil {
+			group = &pb.ListWorkerReply_Group{Name: item.Group.Name}
+		}
 		reply.List = append(reply.List, &pb.ListWorkerReply_Worker{
-			Id:          item.Id,
-			Name:        item.Name,
-			Ip:          item.Ip,
-			Ak:          item.Ak,
-			Sk:          item.Sk,
-			GroupId:     item.GroupId,
-			Status:      item.Status,
-			Description: item.Description,
-			CreatedAt:   uint32(item.CreatedAt),
-			UpdatedAt:   uint32(item.UpdatedAt),
-			Group: &pb.ListWorkerReply_Group{
-				Name: item.Group.Name,
-			},
+			Id:            item.Id,
+			Name:          item.Name,
+			Ip:            item.Ip,
+			Ak:            item.Ak,
+			Sk:            item.Sk,
+			GroupId:       item.GroupId,
+			Status:        item.Status,
+			Description:   item.Description,
+			CreatedAt:     uint32(item.CreatedAt),
+			UpdatedAt:     uint32(item.UpdatedAt),
+			Group:         group,
+			Apps:          item.Apps,
+			LastCheckAt:   item.LastCheckAt,
+			LastHeartbeat: item.LastHeartbeat,
+			LastError:     item.LastError,
 		})
 	}
 
@@ -182,6 +190,7 @@ func (s *Worker) CreateWorker(c context.Context, req *pb.CreateWorkerRequest) (*
 		GroupId:     req.GroupId,
 		Status:      req.Status,
 		Description: req.Description,
+		Apps:        req.Apps,
 	})
 	if err != nil {
 		return nil, err
@@ -199,6 +208,7 @@ func (s *Worker) UpdateWorker(c context.Context, req *pb.UpdateWorkerRequest) (*
 		Sk:          req.Sk,
 		GroupId:     req.GroupId,
 		Description: req.Description,
+		Apps:        req.Apps,
 	}); err != nil {
 		return nil, err
 	}

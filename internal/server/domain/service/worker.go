@@ -1,41 +1,28 @@
 package service
 
 import (
-	"context"
-
 	"github.com/limes-cloud/kratosx"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/limes-cloud/cron/api/cron/errors"
-	"github.com/limes-cloud/cron/internal/server/conf"
 	"github.com/limes-cloud/cron/internal/server/domain/entity"
 	"github.com/limes-cloud/cron/internal/server/domain/repository"
 	"github.com/limes-cloud/cron/internal/server/types"
 )
 
 type Worker struct {
-	conf       *conf.Config
 	repo       repository.Worker
 	taskClient repository.TaskClient
 }
 
 func NewWorker(
-	conf *conf.Config,
 	repo repository.Worker,
 	taskClient repository.TaskClient,
 ) *Worker {
-	worker := &Worker{
-		conf:       conf,
+	return &Worker{
 		repo:       repo,
 		taskClient: taskClient,
 	}
-	repo.RegistryCheckIP(
-		kratosx.MustContext(context.Background()),
-		func(ctx kratosx.Context, req *types.CheckWorkerRequest) error {
-			return taskClient.CheckHealthy(ctx, req)
-		},
-	)
-	return worker
 }
 
 // GetWorkerGroup 获取指定的节点分组
@@ -111,19 +98,25 @@ func (w *Worker) ListWorker(ctx kratosx.Context, req *types.ListWorkerRequest) (
 	return list, total, nil
 }
 
-// CreateWorker 创建节点信息
+// CreateWorker 创建节点信息（全局资源；Apps 为可用应用白名单，空 = 所有应用可用）
 func (w *Worker) CreateWorker(ctx kratosx.Context, worker *entity.Worker) (uint32, error) {
 	worker.Status = proto.Bool(false)
 	id, err := w.repo.CreateWorker(ctx, worker)
 	if err != nil {
 		return 0, errors.CreateError(err.Error())
 	}
+	if err := w.repo.ReplaceWorkerApps(ctx, id, worker.Apps); err != nil {
+		return 0, errors.UpdateError(err.Error())
+	}
 	return id, nil
 }
 
-// UpdateWorker 更新节点信息
+// UpdateWorker 更新节点信息（含可用应用白名单替换）
 func (w *Worker) UpdateWorker(ctx kratosx.Context, worker *entity.Worker) error {
 	if err := w.repo.UpdateWorker(ctx, worker); err != nil {
+		return errors.UpdateError(err.Error())
+	}
+	if err := w.repo.ReplaceWorkerApps(ctx, worker.Id, worker.Apps); err != nil {
 		return errors.UpdateError(err.Error())
 	}
 	return nil
@@ -137,7 +130,7 @@ func (w *Worker) UpdateWorkerStatus(ctx kratosx.Context, id uint32, status bool)
 			return errors.GetError(err.Error())
 		}
 
-		if err := w.repo.CheckIP(ctx, &types.CheckWorkerRequest{
+		if err := w.taskClient.CheckHealthy(ctx, &types.CheckWorkerRequest{
 			IP: worker.Ip,
 			Ak: worker.Ak,
 			Sk: worker.Sk,

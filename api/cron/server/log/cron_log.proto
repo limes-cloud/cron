@@ -89,3 +89,33 @@ message DeleteLogReply {
   uint32 total = 1;
 }
 
+
+// ListExecutionRequest 执行历史查询
+message ListExecutionRequest {
+  uint32 page = 1[(validate.rules).uint32 = {gt: 0}];
+  uint32 pageSize = 2[(validate.rules).uint32 = {gt: 0, lte: 50}];
+  uint32 taskId = 3[(validate.rules).uint32 = {gte: 0}];
+  optional string status = 4;
+  optional string triggerType = 5;
+}
+
+// Execution 执行历史（一次触发）
+message Execution {
+  string id = 1;
+  uint32 taskId = 2;
+  uint32 triggerAt = 3;
+  string triggerType = 4;
+  optional uint32 workerId = 5;
+  string status = 6;
+  uint32 retryCount = 7;
+  optional string logUuid = 8;
+  optional uint32 startedAt = 9;
+  optional uint32 finishedAt = 10;
+  optional string lastError = 11;
+  uint32 createdAt = 12;
+}
+
+message ListExecutionReply {
+  uint32 total = 1;
+  repeated Execution list = 2;
+}

@@ -7,8 +7,6 @@ import (
 	"github.com/go-resty/resty/v2"
 	json "github.com/json-iterator/go"
 	"github.com/limes-cloud/kratosx"
-	"github.com/limes-cloud/kratosx/config"
-	"github.com/limes-cloud/kratosx/library/http"
 
 	"github.com/limes-cloud/cron/internal/client/service"
 )
@@ -42,30 +40,32 @@ func (f *Factory) http(ctx kratosx.Context, task *service.ExecTaskRequest) (int,
 		}
 	}
 
-	request := http.New(&config.Http{
-		EnableLog:        true,
-		RetryCount:       int(task.RetryCount),
-		RetryWaitTime:    1 * time.Second,
-		MaxRetryWaitTime: time.Duration(task.MaxExecTime) * time.Second,
-		Timeout:          60 * time.Second,
-	}, ctx.Logger())
+	// 使用 resty 直接构建请求：kratosx 封装的 response 未暴露 StatusCode，无法与 ExpectCode 匹配。
+	// 重试语义由 server 端 RetryCount 循环统一控制，此处不再重复设置 resty retry，避免执行次数平方。
+	client := resty.New()
+	if task.MaxExecTime != 0 {
+		client.SetTimeout(time.Duration(task.MaxExecTime) * time.Second)
+	} else {
+		client.SetTimeout(60 * time.Second)
+	}
 
-	response, err := request.Option(func(req *resty.Request) {
-		req.URL = data.URL
-		req.Method = data.Method
-		for key, val := range data.Header {
-			req.Header.Set(key, val)
-		}
-		for key, val := range data.Params {
-			req.QueryParam.Set(key, fmt.Sprint(val))
-		}
-		req.Body = body
-	}).Do()
+	req := client.R()
+	req.Header.Set("User-Agent", "cron-http-executor")
+	for key, val := range data.Header {
+		req.Header.Set(key, val)
+	}
+	for key, val := range data.Params {
+		req.QueryParam.Set(key, fmt.Sprint(val))
+	}
+	req.SetBody(body)
+	req.Method = data.Method
+	req.URL = data.URL
 
+	response, err := req.Send()
 	if err != nil {
 		return defaultErrorCode, err
 	}
 
 	f.reply(task.Uuid, logInfo, string(response.Body()))
-	return 0, nil
+	return response.StatusCode(), nil
 }

@@ -70,7 +70,7 @@ func (s *store) scanner(uuid string) (*scanner, error) {
 }
 
 func (s *store) remove(uuid string) error {
-	return os.Remove(uuid)
+	return os.Remove(s.filename(uuid))
 }
 
 // 删除文件的前n行，然后将其余行写入同一文件

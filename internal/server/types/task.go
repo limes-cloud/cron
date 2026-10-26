@@ -1,6 +1,7 @@
 package types
 
 type ListTaskGroupRequest struct {
+	App      string  `json:"-"` // 中转参数（app 层根据 X-App-Key 推导设置，不入 proto）
 	Page     uint32  `json:"page"`
 	PageSize uint32  `json:"pageSize"`
 	Order    *string `json:"order"`
@@ -9,6 +10,7 @@ type ListTaskGroupRequest struct {
 }
 
 type ListTaskRequest struct {
+	App      string  `json:"-"` // 中转参数（app 层根据 X-App-Key 推导设置，不入 proto）
 	Page     uint32  `json:"page"`
 	PageSize uint32  `json:"pageSize"`
 	GroupId  *uint32 `json:"groupId"`
@@ -36,4 +38,14 @@ type CancelExecRequest struct {
 	IP   string
 	Ak   string
 	Sk   string
+}
+
+// ListExecutionRequest 执行历史查询请求
+type ListExecutionRequest struct {
+	App         string  `json:"-"` // 中转参数（app 层根据 X-App-Key 推导设置，不入 proto）
+	Page        uint32  `json:"page"`
+	PageSize    uint32  `json:"pageSize"`
+	TaskId      uint32  `json:"taskId"`
+	Status      *string `json:"status"`      // 可选：按状态过滤（pending/running/success/fail/cancel/skip）
+	TriggerType *string `json:"triggerType"` // 可选：按触发方式过滤（cron/manual/misfire）
 }

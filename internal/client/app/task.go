@@ -19,18 +19,18 @@ type Task struct {
 	srv *service.Task
 }
 
-func NewTask(conf *conf.Config) *Task {
+func NewTask() *Task {
 	return &Task{
 		srv: service.NewTask(
-			conf,
-			factory.New(conf),
+			conf.Instance(),
+			factory.New(conf.Instance()),
 		),
 	}
 }
 
 func init() {
-	register(func(c *conf.Config, hs *http.Server, gs *grpc.Server) {
-		srv := NewTask(c)
+	register(func(hs *http.Server, gs *grpc.Server) {
+		srv := NewTask()
 		pb.RegisterTaskServer(gs, srv)
 	})
 }

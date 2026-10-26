@@ -25,6 +25,10 @@ message GetWorkerReply {
   optional string description = 8;
   uint32 createdAt = 9;
   uint32 updatedAt = 10;
+  repeated string apps = 12; // 可用应用（X-App-Key 白名单；空 = 所有应用可用）
+  optional int64 lastCheckAt = 13;    // 最后一次探测时间（含失败，Unix秒）
+  optional int64 lastHeartbeat = 14;  // 最后一次有效探测时间（成功，Unix秒；NULL=从未上线）
+  optional string lastError = 15;     // 最后一次探测失败原因（成功时清空）
 }
 
 message ListWorkerRequest {
@@ -52,6 +56,10 @@ message ListWorkerReply {
     uint32 createdAt = 9;
     uint32 updatedAt = 10;
     optional Group group = 11;
+    repeated string apps = 12; // 可用应用（X-App-Key 白名单；空 = 所有应用可用）
+    optional int64 lastCheckAt = 13;    // 最后一次探测时间（含失败，Unix秒）
+    optional int64 lastHeartbeat = 14;  // 最后一次有效探测时间（成功，Unix秒；NULL=从未上线）
+    optional string lastError = 15;     // 最后一次探测失败原因（成功时清空）
   }
 
   uint32 total = 1;
@@ -66,6 +74,7 @@ message CreateWorkerRequest {
   optional uint32 groupId = 5[(validate.rules).uint32 = {gt: 0}];
   optional bool status = 6;
   optional string description = 7;
+  repeated string apps = 8; // 可用应用（X-App-Key 白名单；空 = 所有应用可用）
 }
 
 message CreateWorkerReply {
@@ -80,6 +89,7 @@ message UpdateWorkerRequest {
   string sk = 5[(validate.rules).string = {min_len: 1}];
   optional uint32 groupId = 6[(validate.rules).uint32 = {gt: 0}];
   optional string description = 7;
+  repeated string apps = 8; // 可用应用（X-App-Key 白名单；空 = 所有应用可用）
 }
 
 message UpdateWorkerReply {

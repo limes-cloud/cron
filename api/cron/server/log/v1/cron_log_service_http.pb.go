@@ -20,11 +20,14 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationLogGetLog = "/cron.api.server.cron.log.v1.Log/GetLog"
+const OperationLogListExecution = "/cron.api.server.cron.log.v1.Log/ListExecution"
 const OperationLogListLog = "/cron.api.server.cron.log.v1.Log/ListLog"
 
 type LogHTTPServer interface {
 	// GetLog GetLog 获取指定的日志信息
 	GetLog(context.Context, *GetLogRequest) (*GetLogReply, error)
+	// ListExecution ListExecution 获取执行历史列表
+	ListExecution(context.Context, *ListExecutionRequest) (*ListExecutionReply, error)
 	// ListLog ListLog 获取日志信息列表
 	ListLog(context.Context, *ListLogRequest) (*ListLogReply, error)
 }
@@ -33,6 +36,7 @@ func RegisterLogHTTPServer(s *http.Server, srv LogHTTPServer) {
 	r := s.Route("/")
 	r.GET("/cron/api/v1/log", _Log_GetLog0_HTTP_Handler(srv))
 	r.GET("/cron/api/v1/logs", _Log_ListLog0_HTTP_Handler(srv))
+	r.GET("/cron/api/v1/executions", _Log_ListExecution0_HTTP_Handler(srv))
 }
 
 func _Log_GetLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error {
@@ -42,7 +46,7 @@ func _Log_GetLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error {
 			return err
 		}
 		http.SetOperation(ctx, OperationLogGetLog)
-		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetLog(ctx, req.(*GetLogRequest))
 		})
 		out, err := h(ctx, &in)
@@ -61,7 +65,7 @@ func _Log_ListLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error 
 			return err
 		}
 		http.SetOperation(ctx, OperationLogListLog)
-		h := ctx.Middleware(func(ctx context.Context, req any) (any, error) {
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.ListLog(ctx, req.(*ListLogRequest))
 		})
 		out, err := h(ctx, &in)
@@ -73,8 +77,28 @@ func _Log_ListLog0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error 
 	}
 }
 
+func _Log_ListExecution0_HTTP_Handler(srv LogHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListExecutionRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationLogListExecution)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListExecution(ctx, req.(*ListExecutionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListExecutionReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type LogHTTPClient interface {
 	GetLog(ctx context.Context, req *GetLogRequest, opts ...http.CallOption) (rsp *GetLogReply, err error)
+	ListExecution(ctx context.Context, req *ListExecutionRequest, opts ...http.CallOption) (rsp *ListExecutionReply, err error)
 	ListLog(ctx context.Context, req *ListLogRequest, opts ...http.CallOption) (rsp *ListLogReply, err error)
 }
 
@@ -96,7 +120,20 @@ func (c *LogHTTPClientImpl) GetLog(ctx context.Context, in *GetLogRequest, opts 
 	if err != nil {
 		return nil, err
 	}
-	return &out, err
+	return &out, nil
+}
+
+func (c *LogHTTPClientImpl) ListExecution(ctx context.Context, in *ListExecutionRequest, opts ...http.CallOption) (*ListExecutionReply, error) {
+	var out ListExecutionReply
+	pattern := "/cron/api/v1/executions"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationLogListExecution))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *LogHTTPClientImpl) ListLog(ctx context.Context, in *ListLogRequest, opts ...http.CallOption) (*ListLogReply, error) {
@@ -109,5 +146,5 @@ func (c *LogHTTPClientImpl) ListLog(ctx context.Context, in *ListLogRequest, opt
 	if err != nil {
 		return nil, err
 	}
-	return &out, err
+	return &out, nil
 }

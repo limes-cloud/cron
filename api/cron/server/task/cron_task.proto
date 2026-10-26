@@ -44,6 +44,8 @@ message GetTaskReply {
   optional string description = 17;
   optional uint32 start = 23;
   optional uint32 end = 24;
+  optional string routeType = 25 [(validate.rules).string = {in: ["group", "single"]}];
+  optional string misfire = 26 [(validate.rules).string = {in: ["skip", "immediate", "latest"]}];
   uint32 createdAt = 18;
   uint32 updatedAt = 19;
   optional Group group = 20;
@@ -81,6 +83,8 @@ message ListTaskReply {
     optional string description = 17;
     optional uint32 start = 20;
     optional uint32 end = 21;
+    optional string routeType = 22 [(validate.rules).string = {in: ["group", "single"]}];
+    optional string misfire = 23 [(validate.rules).string = {in: ["skip", "immediate", "latest"]}];
     uint32 createdAt = 18;
     uint32 updatedAt = 19;
 
@@ -108,6 +112,8 @@ message CreateTaskRequest {
   optional string description = 15;
   optional uint32 start = 16;
   optional uint32 end = 17;
+  optional string routeType = 18 [(validate.rules).string = {in: ["group", "single"]}];
+  optional string misfire = 19 [(validate.rules).string = {in: ["skip", "immediate", "latest"]}];
 }
 
 message CreateTaskReply {
@@ -132,6 +138,8 @@ message UpdateTaskRequest {
   optional string description = 15;
   optional uint32 start = 16;
   optional uint32 end = 17;
+  optional string routeType = 18 [(validate.rules).string = {in: ["group", "single"]}];
+  optional string misfire = 19 [(validate.rules).string = {in: ["skip", "immediate", "latest"]}];
 }
 
 message UpdateTaskReply {

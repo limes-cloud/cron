@@ -3,6 +3,7 @@ package entity
 import "encoding/json"
 
 type Log struct {
+	App            string `json:"app" gorm:"column:app"`             // 所属应用（X-App-Key，随任务落库快照）
 	Id             uint32 `json:"id" gorm:"primaryKey;column:id"`
 	Uuid           string `json:"uuid" gorm:"column:uuid"`
 	WorkerId       uint32 `json:"workerId" gorm:"column:worker_id"`
@@ -23,6 +24,6 @@ func (l *Log) GetTask() *Task {
 
 func (l *Log) GetWorker() *Worker {
 	var worker Worker
-	_ = json.Unmarshal([]byte(l.TaskSnapshot), &worker)
+	_ = json.Unmarshal([]byte(l.WorkerSnapshot), &worker)
 	return &worker
 }

@@ -44,12 +44,19 @@ type Worker interface {
 	// GetWorkerByIp 获取指定的节点信息
 	GetWorkerByIp(ctx kratosx.Context, ip string) (*entity.Worker, error)
 
-	// GetWorkerByGroupId 获取随机节点
-	GetWorkerByGroupId(ctx kratosx.Context, id uint32) (*entity.Worker, error)
+	// GetWorkerByGroupId 获取随机节点（仅返回授权给 app 的节点；无授权记录的节点对任何 app 可用）
+	GetWorkerByGroupId(ctx kratosx.Context, app string, id uint32) (*entity.Worker, error)
 
-	// CheckIP 检查节点是否可用
-	CheckIP(ctx kratosx.Context, req *types.CheckWorkerRequest) error
+	// ListWorkerApps 获取节点的可用应用白名单（空 = 所有应用可用）
+	ListWorkerApps(ctx kratosx.Context, workerID uint32) ([]string, error)
 
-	// RegistryCheckIP 注册检查节点函数
-	RegistryCheckIP(ctx kratosx.Context, check func(ctx kratosx.Context, req *types.CheckWorkerRequest) error)
+	// ReplaceWorkerApps 替换节点的可用应用白名单（事务；空列表 = 清空授权 = 所有应用可用）
+	ReplaceWorkerApps(ctx kratosx.Context, workerID uint32, apps []string) error
+
+	// ListEnabledWorkers 获取启用的节点（探测候选，含授权白名单）
+	ListEnabledWorkers(ctx kratosx.Context) ([]*entity.Worker, error)
+
+	// UpdateProbeResult 更新节点探测结果（last_check_at 恒刷新；成功时刷新 last_heartbeat 并清空 last_error）
+	UpdateProbeResult(ctx kratosx.Context, id uint32, checkAt int64, heartbeatAt *int64, errMsg string) error
+
 }

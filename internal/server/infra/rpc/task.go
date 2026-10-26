@@ -91,7 +91,8 @@ func (i TaskClient) ExecTask(ctx kratosx.Context, req *types.ExecTaskRequest, re
 	for {
 		msg, rer := stream.Recv()
 		if rer != nil {
-			return err
+			// 流正常结束返回 io.EOF（调用方识别为成功）；其余错误如实回传，禁止吞成 nil
+			return rer
 		}
 		recv(&types.ExecTaskLog{
 			Type:    msg.Type,
